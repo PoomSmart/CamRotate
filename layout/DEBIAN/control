@@ -1,0 +1,11 @@
+Package: org.thebigboss.camrotate
+Name: CamRotate
+Depends: mobilesubstrate, preferenceloader
+Conflicts: gsc.ipad
+Version: 1.0
+Architecture: iphoneos-arm
+Description: rotate camera interface in the way you like.
+Maintainer: PoomSmart
+Author: PoomSmart
+Section: Tweaks
+Icon: file:///Library/PreferenceBundles/CamRotateSettings.bundle/CamRotate@2x.png

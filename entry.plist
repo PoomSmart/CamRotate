@@ -1,0 +1,10 @@
+{
+	entry = {
+		bundle = "CamRotateSettings";
+		cell = PSLinkCell;
+		detail = "CamRotatePreferenceController";
+		icon = "CamRotate.png";
+		isController = 1;
+		label = "CamRotate";
+	};
+}

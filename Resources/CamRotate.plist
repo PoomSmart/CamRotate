@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>title</key>
+    <string>CamRotate</string>
+    <key>entry</key>
+    <dict>
+      <key>cell</key>
+      <string>PSLinkCell</string>
+      <key>icon</key>
+      <string>CamRotate.png</string>
+      <key>label</key>
+      <string>CamRotate</string>
+    </dict>
+    <key>items</key>
+    <array>
+      <dict>
+        <key>cell</key>
+        <string>PSSwitchCell</string>
+        <key>alternateColors</key>
+        <true/>
+        <key>default</key>
+        <false/>
+        <key>defaults</key>
+        <string>com.PS.CamRotate</string>
+        <key>key</key>
+        <string>CamRotateEnabled</string>
+        <key>id</key>
+		<string>CamRotate</string>
+		<key>set</key>
+        <string>setCamRotate:specifier:</string>
+        <key>label</key>
+        <string>Enabled</string>
+        <key>PostNotification</key>
+        <string>com.PS.CamRotate.settingschanged</string>
+      </dict>
+      <dict>
+        <key>cell</key>
+        <string>PSSwitchCell</string>
+        <key>default</key>
+        <false/>
+        <key>defaults</key>
+        <string>com.PS.CamRotate</string>
+        <key>key</key>
+        <string>CamRotateLock</string>
+        <key>id</key>
+		<string>CamRotateLock</string>
+        <key>set</key>
+        <string>setCamRotateLock:specifier:</string>
+        <key>label</key>
+        <string>Lock Rotation</string>
+        <key>PostNotification</key>
+        <string>com.PS.CamRotate.settingschanged</string>
+      </dict>
+      <dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<string>Portrait</string>
+			<key>defaults</key>
+			<string>com.PS.CamRotate</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>key</key>
+			<string>OrientationValue</string>
+			<key>id</key>
+			<string>OrientationValue</string>
+			<key>label</key>
+			<string>Orientation</string>
+			<key>PostNotification</key>
+        	<string>com.PS.CamRotate.settingschanged</string>
+			<key>validTitles</key>
+			<array>
+				<string>Portrait</string>
+				<string>Portrait Upside Down</string>
+				<string>Landscape Left</string>
+				<string>Landscape Right</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+			</array>
+		</dict>
+		<dict>
+        <key>cell</key>
+        <string>PSSwitchCell</string>
+        <key>default</key>
+        <false/>
+        <key>defaults</key>
+        <string>com.PS.CamRotate</string>
+        <key>key</key>
+        <string>SyncOrientation</string>
+        <key>id</key>
+		<string>SyncOrientation</string>
+        <key>set</key>
+        <string>setSyncOrientation:specifier:</string>
+        <key>label</key>
+        <string>Sync Orientation</string>
+        <key>PostNotification</key>
+        <string>com.PS.CamRotate.settingschanged</string>
+      </dict>
+      <dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>defaults</key>
+			<string>com.PS.CamRotate</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>key</key>
+			<string>RotationStyle</string>
+			<key>id</key>
+			<string>RotationStyle</string>
+			<key>enabled</key>
+			<true/>
+			<key>label</key>
+			<string>Rotation Style</string>
+			<key>PostNotification</key>
+        	<string>com.PS.CamRotate.settingschanged</string>
+			<key>validTitles</key>
+			<array>
+				<string>Default</string>
+				<string>iPad-like</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>2</integer>
+				<integer>3</integer>
+			</array>
+		</dict>
+		<dict>
+        <key>cell</key>
+        <string>PSGroupCell</string>
+		<key>id</key>
+		<string>Description</string>
+        <key>footerText</key>
+        <string>Lock Rotation - Disallow orientation changing in camera.
+Sync Orientation - Sync camera orientation with system. (By default, even you lock orientation in iDevice, camera still can rotate itself, this one fix that issue.)
+Rotation Style (iOS 6 only)
+1. Default - Camera-default. (UIs in camera view will fading when they change orientation)
+2. iPad-like - UIs in camera view will rotate around the middle of screen correspond with camera orientation.
+
+© 2013 Thuchapol Unprasert
+(@PoomSmart)</string>
+      </dict>
+    </array>
+  </dict>
+</plist>
+	
