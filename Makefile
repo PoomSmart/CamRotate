@@ -2,7 +2,6 @@ GO_EASY_ON_ME = 1
 TARGET_IPHONEOS_DEPLOYMENT_VERSION = 5.0
 
 include theos/makefiles/common.mk
-export ARCHS = armv7
 TWEAK_NAME = CamRotate
 CamRotate_FILES = CamRotate.xm
 CamRotate_FRAMEWORKS = UIKit
