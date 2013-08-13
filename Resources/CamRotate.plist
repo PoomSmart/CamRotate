@@ -112,6 +112,8 @@
 			<string>PSListItemsController</string>
 			<key>key</key>
 			<string>RotationStyle</string>
+			<key>set</key>
+			<string>killCam:specifier:</string>
 			<key>id</key>
 			<string>RotationStyle</string>
 			<key>enabled</key>
