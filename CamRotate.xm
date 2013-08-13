@@ -52,8 +52,6 @@ static void CamRotateLoader()
 					return 4; break;
 				case UIInterfaceOrientationLandscapeRight:
 					return 3; break;
-				default:
-					return [[UIDevice currentDevice] orientation]; break;
 			}
 		}
 	}
