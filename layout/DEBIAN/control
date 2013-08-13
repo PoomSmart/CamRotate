@@ -1,6 +1,6 @@
 Package: org.thebigboss.camrotate
 Name: CamRotate
-Depends: mobilesubstrate, preferenceloader
+Depends: mobilesubstrate, preferenceloader, gsc.firmware (>= 5.0)
 Conflicts: gsc.ipad
 Version: 1.0
 Architecture: iphoneos-arm
