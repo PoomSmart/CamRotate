@@ -110,6 +110,13 @@
 	[self reloadSpecifier:self.camRotateLockSpec animated:NO];
 }
 
+- (void)killCam:(id)value specifier:(PSSpecifier *)spec
+{
+	[self setPreferenceValue:value specifier:spec];
+	[[NSUserDefaults standardUserDefaults] synchronize];
+	system("killall Camera");
+}
+
 - (NSArray *)specifiers
 {
 	if (_specifiers == nil) {
