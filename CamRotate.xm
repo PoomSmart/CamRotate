@@ -4,9 +4,15 @@ static BOOL isiOS5 = (kCFCoreFoundationVersionNumber >= 675.00 && kCFCoreFoundat
 static BOOL CamRotateisOn;
 static BOOL CamRotateLock;
 static BOOL SyncOrientation;
+static BOOL UnlockVideoUI;
+static BOOL unlockVideo = NO;
 
 static int rotationStyle;
 static int orientationValue;
+
+@interface PLCameraController
+- (BOOL)isCapturingVideo;
+@end
 
 static void CamRotateLoader()
 {
@@ -17,11 +23,41 @@ static void CamRotateLoader()
 	CamRotateLock = CamRotateLockEnabled ? [CamRotateLockEnabled boolValue] : NO;
 	id SyncOrientationEnabled = [dict objectForKey:@"SyncOrientation"];
 	SyncOrientation = SyncOrientationEnabled ? [SyncOrientationEnabled boolValue] : NO;
+	id UnlockVideoUIEnabled = [dict objectForKey:@"UnlockVideoUI"];
+	UnlockVideoUI = UnlockVideoUIEnabled ? [UnlockVideoUIEnabled boolValue] : NO;
 	id RotationStyle = [dict objectForKey:@"RotationStyle"];
 	rotationStyle = RotationStyle ? [RotationStyle integerValue] : 2;
 	id OrientationValue = [dict objectForKey:@"OrientationValue"];
 	orientationValue = OrientationValue ? [OrientationValue integerValue] : 1;
 }
+
+
+%hook PLCameraController
+
+- (BOOL)isCapturingVideo
+{
+	if (CamRotateisOn) {
+		if (UnlockVideoUI && unlockVideo)
+			return NO;
+		return %orig;
+	}
+	return %orig;
+}
+
+- (void)accelerometer:(id)accelerometer didChangeDeviceOrientation:(int)orientation
+{
+	if (CamRotateisOn) {
+		if ([self isCapturingVideo] && UnlockVideoUI) {
+			unlockVideo = YES;
+			%orig;
+			unlockVideo = NO;
+		}
+		else %orig;
+	}
+	else %orig;
+}
+
+%end
 
 %hook PLCameraView
 
@@ -60,6 +96,16 @@ static void CamRotateLoader()
 
 %end
 
+%hook PLCameraElapsedTimeView
+
+- (void)_setDeviceOrientation:(int)orientation animated:(BOOL)animated
+{
+	if (CamRotateisOn) {
+		if (unlockVideo) return;
+	} else %orig;
+}
+
+%end
 
 static void PostNotification(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {

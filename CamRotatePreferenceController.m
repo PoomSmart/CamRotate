@@ -20,12 +20,16 @@
 	PSSpecifier *_orientationSpec;
 	PSSpecifier *_syncOrientationSpec;
 	PSSpecifier *_rotationStyleSpec;
+	PSSpecifier *_spaceSpec;
+	PSSpecifier *_unlockVideoUISpec;
 	PSSpecifier *_descriptionSpec;
 }
 @property (nonatomic, retain) PSSpecifier *camRotateLockSpec;
 @property (nonatomic, retain) PSSpecifier *orientationSpec;
 @property (nonatomic, retain) PSSpecifier *syncOrientationSpec;
 @property (nonatomic, retain) PSSpecifier *rotationStyleSpec;
+@property (nonatomic, retain) PSSpecifier *spaceSpec;
+@property (nonatomic, retain) PSSpecifier *unlockVideoUISpec;
 @property (nonatomic, retain) PSSpecifier *descriptionSpec;
 @end
 
@@ -35,6 +39,8 @@
 @synthesize orientationSpec = _orientationSpec;
 @synthesize syncOrientationSpec = _syncOrientationSpec;
 @synthesize rotationStyleSpec = _rotationStyleSpec;
+@synthesize spaceSpec = _spaceSpec;
+@synthesize unlockVideoUISpec = _unlockVideoUISpec;
 @synthesize descriptionSpec = _descriptionSpec;
 
 - (void)viewDidUnload
@@ -43,6 +49,8 @@
 	self.orientationSpec = nil;
 	self.syncOrientationSpec = nil;
     self.rotationStyleSpec = nil;
+    self.spaceSpec = nil;
+    self.unlockVideoUISpec = nil;
     self.descriptionSpec = nil;
     [super viewDidUnload];
 }
@@ -71,16 +79,22 @@
 	else if ([self specifierForID:@"SyncOrientation"] && ![value boolValue])
 		[self removeSpecifierID:@"SyncOrientation" animated:NO];
 		
+	if (![self specifierForID:@"UnlockVideoUI"] && [value boolValue])
+		[self insertSpecifier:self.unlockVideoUISpec afterSpecifierID:@"space" animated:NO];
+	else if ([self specifierForID:@"UnlockVideoUI"] && ![value boolValue])
+		[self removeSpecifierID:@"UnlockVideoUI" animated:NO];
+		
 	if ([value boolValue]) {
-		if ([self specifierForID:@"SyncOrientation"] && !isiOS5)
+		if ([self specifierForID:@"SyncOrientation"] && !isiOS5) {
 			[self insertSpecifier:self.rotationStyleSpec afterSpecifierID:@"SyncOrientation" animated:NO];
-		if (self.rotationStyleSpec)
-			[self insertSpecifier:self.descriptionSpec afterSpecifierID:@"RotationStyle" animated:NO];
-		else
-			[self insertSpecifier:self.descriptionSpec afterSpecifierID:@"SyncOrientation" animated:NO];
+			[self insertSpecifier:self.spaceSpec afterSpecifierID:@"RotationStyle" animated:NO];
+		}
+		[self insertSpecifier:self.descriptionSpec afterSpecifierID:@"UnlockVideoUI" animated:NO];
 	}
 	else if (![value boolValue]) {
 		[self removeSpecifierID:@"Description" animated:NO];
+		[self removeSpecifierID:@"UnlockVideoUI" animated:NO];
+		[self removeSpecifierID:@"space" animated:NO];
 		if (self.rotationStyleSpec) [self removeSpecifierID:@"RotationStyle" animated:NO];
 	}
 	
@@ -101,6 +115,8 @@
 		setAvailable(![value boolValue], self.rotationStyleSpec)
 		[self reloadSpecifier:self.rotationStyleSpec animated:NO];
 	}
+	setAvailable(![value boolValue], self.unlockVideoUISpec)
+	[self reloadSpecifier:self.unlockVideoUISpec animated:NO];
 }
 
 - (void)setSyncOrientation:(id)value specifier:(PSSpecifier *)spec
@@ -112,8 +128,7 @@
 
 - (void)killCam:(id)value specifier:(PSSpecifier *)spec
 {
-	[self setPreferenceValue:value specifier:spec];
-	[[NSUserDefaults standardUserDefaults] synchronize];
+	orig
 	system("killall Camera");
 }
 
@@ -132,6 +147,10 @@
                 self.syncOrientationSpec = spec;
             if ([[[spec properties] objectForKey:@"id"] isEqualToString:@"RotationStyle"])
                 self.rotationStyleSpec = spec;
+             if ([[[spec properties] objectForKey:@"id"] isEqualToString:@"space"])
+            	self.spaceSpec = spec;
+            if ([[[spec properties] objectForKey:@"id"] isEqualToString:@"UnlockVideoUI"])
+            	self.unlockVideoUISpec = spec;
             if ([[[spec properties] objectForKey:@"id"] isEqualToString:@"Description"])
             	self.descriptionSpec = spec;
         }
@@ -142,6 +161,8 @@
        		[specs removeObject:self.orientationSpec];
        		[specs removeObject:self.syncOrientationSpec];
        		if (self.rotationStyleSpec) [specs removeObject:self.rotationStyleSpec];
+       		[specs removeObject:self.spaceSpec];
+       		[specs removeObject:self.unlockVideoUISpec];
        		[specs removeObject:self.descriptionSpec];
        	}
         
@@ -149,6 +170,7 @@
        	if (![[dict objectForKey:@"CamRotateLock"] boolValue])
        		[specs removeObject:self.orientationSpec];
        	
+       	setAvailable(![[dict objectForKey:@"CamRotateLock"] boolValue], self.unlockVideoUISpec)
        	setAvailable(![[dict objectForKey:@"CamRotateLock"] boolValue], self.syncOrientationSpec)
        	setAvailable(![[dict objectForKey:@"SyncOrientation"] boolValue], self.camRotateLockSpec)
 		if (self.rotationStyleSpec) setAvailable(![[dict objectForKey:@"CamRotateLock"] boolValue], self.rotationStyleSpec)

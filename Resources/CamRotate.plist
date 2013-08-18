@@ -136,14 +136,42 @@
 		<dict>
         <key>cell</key>
         <string>PSGroupCell</string>
+        <key>id</key>
+		<string>space</string>
+        <key>label</key>
+        <string>Allow rotation when recording video</string>
+        </dict>
+        <dict>
+        <key>cell</key>
+        <string>PSSwitchCell</string>
+        <key>default</key>
+        <false/>
+        <key>defaults</key>
+        <string>com.PS.CamRotate</string>
+        <key>key</key>
+        <string>UnlockVideoUI</string>
+        <key>id</key>
+		<string>UnlockVideoUI</string>
+        <key>label</key>
+        <string>Enabled</string>
+        <key>PostNotification</key>
+        <string>com.PS.CamRotate.settingschanged</string>
+      </dict>
+		<dict>
+        <key>cell</key>
+        <string>PSGroupCell</string>
 		<key>id</key>
 		<string>Description</string>
         <key>footerText</key>
-        <string>Lock Rotation - Disallow orientation changing in camera.
-Sync Orientation - Sync camera orientation with system. (By default, even you lock orientation in iDevice, camera still can rotate itself, this one fix that issue.)
-Rotation Style (iOS 6 only)
+        <string>• Lock Rotation - Disallow orientation changing in camera.
+        
+• Sync Orientation - Sync camera orientation with system. (By default, even you lock orientation in iDevice, camera still can rotate itself, this one fix that issue.)
+
+• Rotation Style (iOS 6 only)
 1. Default - Camera-default. (UIs in camera view will fading when they change orientation)
 2. iPad-like - UIs in camera view will rotate around the middle of screen correspond with camera orientation.
+
+• Allow rotation when recording video - Prevent camera from orientation fixed while recording video.
 
 © 2013 Thuchapol Unprasert
 (@PoomSmart)</string>
