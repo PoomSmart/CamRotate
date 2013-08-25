@@ -11,6 +11,7 @@ static int rotationStyle;
 static int orientationValue;
 
 @interface PLCameraController
+@property(readonly, assign, nonatomic) int cameraOrientation;
 - (BOOL)isCapturingVideo;
 @end
 
@@ -34,6 +35,12 @@ static void CamRotateLoader()
 
 %hook PLCameraController
 
+%new
+- (BOOL)isSyncOrientation
+{
+	return SyncOrientation;
+}
+
 - (BOOL)isCapturingVideo
 {
 	if (CamRotateisOn) {
@@ -51,10 +58,12 @@ static void CamRotateLoader()
 			unlockVideo = YES;
 			%orig;
 			unlockVideo = NO;
+			return;
 		}
-		else %orig;
+		%orig;
+		return;
 	}
-	else %orig;
+	%orig;
 }
 
 %end
