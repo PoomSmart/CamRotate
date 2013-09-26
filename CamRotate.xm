@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 
-static BOOL isiOS5 = (kCFCoreFoundationVersionNumber >= 675.00 && kCFCoreFoundationVersionNumber < 793.00);
 static BOOL CamRotateisOn;
 static BOOL CamRotateLock;
 static BOOL SyncOrientation;
@@ -11,9 +10,17 @@ static int rotationStyle;
 static int orientationValue;
 
 @interface PLCameraController
-@property(readonly, assign, nonatomic) int cameraOrientation;
+@property(assign, nonatomic) int captureOrientation;
 - (BOOL)isCapturingVideo;
 @end
+
+@interface PLCameraView
+@end
+
+@interface PLUICameraViewController
+- (PLCameraView *)_cameraView;
+@end
+
 
 static void CamRotateLoader()
 {
@@ -58,31 +65,67 @@ static void CamRotateLoader()
 			unlockVideo = YES;
 			%orig;
 			unlockVideo = NO;
-			return;
-		}
+		} else
+			%orig;
+	} else
 		%orig;
-		return;
-	}
+}
+
+%end
+
+%hook PLApplicationCameraViewController
+
+- (void)loadView
+{
 	%orig;
+	if (CamRotateisOn) {
+		if (rotationStyle == 3 && kCFCoreFoundationVersionNumber >= 793.00) {
+			PLCameraView *view = MSHookIvar<PLCameraView *>(self, "_cameraView");
+			MSHookIvar<int>(view, "_rotationStyle") = -1;
+		}
+	}
+}
+
+%end
+
+%hook PLUICameraViewController
+
+- (void)viewWillAppear:(BOOL)appear
+{
+	%orig;
+	if (CamRotateisOn) {
+		if (rotationStyle == 3 && kCFCoreFoundationVersionNumber >= 793.00) {
+			PLCameraView *view = [self _cameraView];
+			MSHookIvar<int>(view, "_rotationStyle") = -1;
+		}
+	}
 }
 
 %end
 
 %hook PLCameraView
 
-- (int)rotationStyle
+- (float)previewImageRotationAngle
 {
-	return CamRotateisOn && !isiOS5 ? rotationStyle : %orig;
+	if (CamRotateisOn) {
+		if (rotationStyle == 3 && kCFCoreFoundationVersionNumber >= 793.00) {
+			MSHookIvar<int>(self, "_rotationStyle") = 2;
+		}
+	}
+	return %orig;
 }
 
-- (void)setRotationStyle:(int)style
+- (void)_setupAnimatePreviewDown:(id)down flipImage:(BOOL)image panoImage:(BOOL)image3 snapshotFrame:(CGRect)frame
 {
-	if (CamRotateisOn && !isiOS5)
-		%orig(rotationStyle);
-	else %orig;
+	%orig;
+	if (CamRotateisOn) {
+		if (rotationStyle == 3 && kCFCoreFoundationVersionNumber >= 793.00) {
+			MSHookIvar<int>(self, "_rotationStyle") = -1;
+		}
+	}
 }
 
-- (int)_glyphOrientationForCameraOrientation:(int)arg1
+- (int)_glyphOrientationForCameraOrientation:(int)orientation
 {
 	if (CamRotateisOn) {
 		if (CamRotateLock) return orientationValue;
@@ -90,13 +133,15 @@ static void CamRotateLoader()
 			UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
 			switch (orientation) {
 				case UIInterfaceOrientationPortrait:
-					return 1; break;
+					return 1;
 				case UIInterfaceOrientationPortraitUpsideDown:
-					return 2; break;
+					return 2;
 				case UIInterfaceOrientationLandscapeLeft:
-					return 4; break;
+					return 4;
 				case UIInterfaceOrientationLandscapeRight:
-					return 3; break;
+					return 3;
+				default:
+					return %orig;
 			}
 		}
 	}
@@ -127,5 +172,5 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 	CamRotateLoader();
   	%init;
-  	[pool release];
+  	[pool drain];
 }
