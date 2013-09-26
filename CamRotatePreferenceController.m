@@ -8,6 +8,13 @@
 #define PLIST_PATH @"/Library/PreferenceBundles/CamRotateSettings.bundle/CamRotate.plist"
 #define setAvailable(available, spec) [spec setProperty:[NSNumber numberWithBool:available] forKey:@"enabled"];
 #define CamRotateIsOn [[dict objectForKey:@"CamRotateEnabled"] boolValue]
+
+#define AddSpecBeforeSpec(spec, afterSpecName) \
+if (![self specifierForID:spec.identifier] && [value boolValue]) \
+	[self insertSpecifier:spec afterSpecifierID:afterSpecName animated:NO]; \
+else \
+	[self removeSpecifierID:spec.identifier animated:NO];
+	
 #define orig 	[self setPreferenceValue:value specifier:spec]; \
 		[[NSUserDefaults standardUserDefaults] synchronize];
 				
@@ -60,44 +67,21 @@
 	orig
 	LoadPlist
 	
-	if (![self specifierForID:@"CamRotateLock"] && [value boolValue])
-		[self insertSpecifier:self.camRotateLockSpec afterSpecifierID:@"CamRotate" animated:NO];
-	else if ([self specifierForID:@"CamRotateLock"] && ![value boolValue])
-		[self removeSpecifierID:@"CamRotateLock" animated:NO];
+	AddSpecBeforeSpec(self.camRotateLockSpec, @"CamRotate")
 	
-	if (![self specifierForID:@"OrientationValue"] && [[dict objectForKey:@"CamRotateLock"] boolValue] && [value boolValue])
-		[self insertSpecifier:self.orientationSpec afterSpecifierID:@"CamRotateLock" animated:NO];
-	else if ([self specifierForID:@"OrientationValue"] && ![value boolValue])
-		[self removeSpecifierID:@"OrientationValue" animated:NO];
-		
-	if (![self specifierForID:@"SyncOrientation"] && [value boolValue]) {
-		if ([self specifierForID:@"OrientationValue"])
-			[self insertSpecifier:self.syncOrientationSpec afterSpecifierID:@"OrientationValue" animated:NO];
-		else
-			[self insertSpecifier:self.syncOrientationSpec afterSpecifierID:@"CamRotateLock" animated:NO];
+	if ([[dict objectForKey:@"CamRotateLock"] boolValue]) {
+		AddSpecBeforeSpec(self.orientationSpec, @"CamRotateLock")
 	}
-	else if ([self specifierForID:@"SyncOrientation"] && ![value boolValue])
-		[self removeSpecifierID:@"SyncOrientation" animated:NO];
-		
-	if (![self specifierForID:@"UnlockVideoUI"] && [value boolValue])
-		[self insertSpecifier:self.unlockVideoUISpec afterSpecifierID:@"space" animated:NO];
-	else if ([self specifierForID:@"UnlockVideoUI"] && ![value boolValue])
-		[self removeSpecifierID:@"UnlockVideoUI" animated:NO];
-		
-	if ([value boolValue]) {
-		if ([self specifierForID:@"SyncOrientation"] && !isiOS5) {
-			[self insertSpecifier:self.rotationStyleSpec afterSpecifierID:@"SyncOrientation" animated:NO];
-			[self insertSpecifier:self.spaceSpec afterSpecifierID:@"RotationStyle" animated:NO];
-		}
-		[self insertSpecifier:self.descriptionSpec afterSpecifierID:@"UnlockVideoUI" animated:NO];
+	
+	AddSpecBeforeSpec(self.syncOrientationSpec, [self specifierForID:@"OrientationValue"] ? @"OrientationValue" : @"CamRotateLock")
+	if (!isiOS5) {
+		AddSpecBeforeSpec(self.rotationStyleSpec, @"SyncOrientation")
+		AddSpecBeforeSpec(self.spaceSpec, @"RotationStyle")
+	} else {
+		AddSpecBeforeSpec(self.spaceSpec, @"SyncOrientation")
 	}
-	else if (![value boolValue]) {
-		[self removeSpecifierID:@"Description" animated:NO];
-		[self removeSpecifierID:@"UnlockVideoUI" animated:NO];
-		[self removeSpecifierID:@"space" animated:NO];
-		if (self.rotationStyleSpec)
-			[self removeSpecifierID:@"RotationStyle" animated:NO];
-	}
+	AddSpecBeforeSpec(self.unlockVideoUISpec, @"space")
+	AddSpecBeforeSpec(self.descriptionSpec, @"UnlockVideoUI")
 	
 }
 
