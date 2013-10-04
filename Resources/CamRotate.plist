@@ -49,7 +49,7 @@
         <key>set</key>
         <string>setCamRotateLock:specifier:</string>
         <key>label</key>
-        <string>Lock Rotation</string>
+        <string>Lock Orientation</string>
         <key>PostNotification</key>
         <string>com.PS.CamRotate.settingschanged</string>
       </dict>
