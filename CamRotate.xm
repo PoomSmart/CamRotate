@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 static BOOL CamRotateisOn;
 static BOOL CamRotateLock;
@@ -9,8 +9,11 @@ static BOOL unlockVideo = NO;
 static int rotationStyle;
 static int orientationValue;
 
+extern "C" NSBundle *PLPhotoLibraryFrameworkBundle();
+
+#define isiOS6Up (kCFCoreFoundationVersionNumber >= 793.00)
+
 @interface PLCameraController
-@property(assign, nonatomic) int captureOrientation;
 - (BOOL)isCapturingVideo;
 @end
 
@@ -39,6 +42,16 @@ static void CamRotateLoader()
 	orientationValue = OrientationValue ? [OrientationValue integerValue] : 1;
 }
 
+
+%hook UIImage
+
+// This method will make CamRotate works in iMessages app, I don't know why
++ (UIImage *)imageNamed:(NSString *)name inBundle:(NSBundle *)bundle
+{
+	return %orig;
+}
+
+%end
 
 %hook PLCameraController
 
@@ -79,7 +92,7 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && kCFCoreFoundationVersionNumber >= 793.00) {
+		if (rotationStyle == 3 && isiOS6Up) {
 			PLCameraView *view = MSHookIvar<PLCameraView *>(self, "_cameraView");
 			MSHookIvar<int>(view, "_rotationStyle") = -1;
 		}
@@ -94,7 +107,7 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && kCFCoreFoundationVersionNumber >= 793.00) {
+		if (rotationStyle == 3 && isiOS6Up) {
 			PLCameraView *view = [self _cameraView];
 			MSHookIvar<int>(view, "_rotationStyle") = -1;
 		}
@@ -108,9 +121,8 @@ static void CamRotateLoader()
 - (float)previewImageRotationAngle
 {
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && kCFCoreFoundationVersionNumber >= 793.00) {
+		if (rotationStyle == 3 && isiOS6Up)
 			MSHookIvar<int>(self, "_rotationStyle") = 2;
-		}
 	}
 	return %orig;
 }
@@ -119,19 +131,19 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && kCFCoreFoundationVersionNumber >= 793.00) {
+		if (rotationStyle == 3 && isiOS6Up)
 			MSHookIvar<int>(self, "_rotationStyle") = -1;
-		}
 	}
 }
 
 - (int)_glyphOrientationForCameraOrientation:(int)orientation
 {
 	if (CamRotateisOn) {
-		if (CamRotateLock) return orientationValue;
+		if (CamRotateLock)
+			return orientationValue;
 		if (SyncOrientation) {
-			UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
-			switch (orientation) {
+			UIInterfaceOrientation orient = [[UIDevice currentDevice] orientation];
+			switch (orient) {
 				case UIInterfaceOrientationPortrait:
 					return 1;
 				case UIInterfaceOrientationPortraitUpsideDown:
@@ -156,7 +168,8 @@ static void CamRotateLoader()
 {
 	if (CamRotateisOn) {
 		if (unlockVideo) return;
-	} else %orig;
+	} else
+		%orig;
 }
 
 %end
