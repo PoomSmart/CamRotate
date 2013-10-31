@@ -6,7 +6,6 @@ include theos/makefiles/common.mk
 TWEAK_NAME = CamRotate
 CamRotate_FILES = CamRotate.xm
 CamRotate_FRAMEWORKS = UIKit
-CamRotate_PRIVATE_FRAMEWORKS = PhotoLibrary
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 

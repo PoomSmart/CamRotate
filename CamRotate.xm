@@ -9,8 +9,6 @@ static BOOL unlockVideo = NO;
 static int rotationStyle;
 static int orientationValue;
 
-extern "C" NSBundle *PLPhotoLibraryFrameworkBundle();
-
 #define isiOS6Up (kCFCoreFoundationVersionNumber >= 793.00)
 
 @interface PLCameraController
@@ -28,14 +26,10 @@ extern "C" NSBundle *PLPhotoLibraryFrameworkBundle();
 static void CamRotateLoader()
 {
 	NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.PS.CamRotate.plist"];
-	id CamRotateEnabled = [dict objectForKey:@"CamRotateEnabled"];
-	CamRotateisOn = CamRotateEnabled ? [CamRotateEnabled boolValue] : NO;
-	id CamRotateLockEnabled = [dict objectForKey:@"CamRotateLock"];
-	CamRotateLock = CamRotateLockEnabled ? [CamRotateLockEnabled boolValue] : NO;
-	id SyncOrientationEnabled = [dict objectForKey:@"SyncOrientation"];
-	SyncOrientation = SyncOrientationEnabled ? [SyncOrientationEnabled boolValue] : NO;
-	id UnlockVideoUIEnabled = [dict objectForKey:@"UnlockVideoUI"];
-	UnlockVideoUI = UnlockVideoUIEnabled ? [UnlockVideoUIEnabled boolValue] : NO;
+	CamRotateisOn = [[dict objectForKey:@"CamRotateEnabled"] boolValue];
+	CamRotateLock = [[dict objectForKey:@"CamRotateLock"] boolValue];
+	SyncOrientation = [[dict objectForKey:@"SyncOrientation"] boolValue];
+	UnlockVideoUI = [[dict objectForKey:@"UnlockVideoUI"] boolValue];
 	id RotationStyle = [dict objectForKey:@"RotationStyle"];
 	rotationStyle = RotationStyle ? [RotationStyle integerValue] : 2;
 	id OrientationValue = [dict objectForKey:@"OrientationValue"];
@@ -45,7 +39,6 @@ static void CamRotateLoader()
 
 %hook UIImage
 
-// This method will make CamRotate works in iMessages app, I don't know why
 + (UIImage *)imageNamed:(NSString *)name inBundle:(NSBundle *)bundle
 {
 	return %orig;
