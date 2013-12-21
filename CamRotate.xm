@@ -9,7 +9,7 @@ static BOOL unlockVideo = NO;
 static int rotationStyle;
 static int orientationValue;
 
-#define isiOS6Up (kCFCoreFoundationVersionNumber >= 793.00)
+#define isiOS6 (kCFCoreFoundationVersionNumber == 793.00)
 
 @interface PLCameraController
 - (BOOL)isCapturingVideo;
@@ -85,7 +85,7 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && isiOS6Up) {
+		if (rotationStyle == 3 && isiOS6) {
 			PLCameraView *view = MSHookIvar<PLCameraView *>(self, "_cameraView");
 			MSHookIvar<int>(view, "_rotationStyle") = -1;
 		}
@@ -100,7 +100,7 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && isiOS6Up) {
+		if (rotationStyle == 3 && isiOS6) {
 			PLCameraView *view = [self _cameraView];
 			MSHookIvar<int>(view, "_rotationStyle") = -1;
 		}
@@ -114,7 +114,7 @@ static void CamRotateLoader()
 - (float)previewImageRotationAngle
 {
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && isiOS6Up)
+		if (rotationStyle == 3 && isiOS6)
 			MSHookIvar<int>(self, "_rotationStyle") = 2;
 	}
 	return %orig;
@@ -124,7 +124,7 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && isiOS6Up)
+		if (rotationStyle == 3 && isiOS6)
 			MSHookIvar<int>(self, "_rotationStyle") = -1;
 	}
 }
@@ -177,6 +177,6 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 	CamRotateLoader();
-  	%init;
-  	[pool drain];
+	%init;
+	[pool drain];
 }
