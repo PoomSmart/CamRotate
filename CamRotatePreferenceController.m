@@ -17,10 +17,6 @@ else \
 	
 #define orig 	[self setPreferenceValue:value specifier:spec]; \
 		[[NSUserDefaults standardUserDefaults] synchronize];
-				
-@interface PSListController (CamRotate)
-- (void)viewDidUnload;
-@end
 
 @interface CamRotatePreferenceController : PSListController {
 	PSSpecifier *_camRotateLockSpec;
@@ -55,11 +51,11 @@ else \
 	self.camRotateLockSpec = nil;
 	self.orientationSpec = nil;
 	self.syncOrientationSpec = nil;
-    	self.rotationStyleSpec = nil;
-    	self.spaceSpec = nil;
-    	self.unlockVideoUISpec = nil;
-    	self.descriptionSpec = nil;
-    	[super viewDidUnload];
+	self.rotationStyleSpec = nil;
+	self.spaceSpec = nil;
+	self.unlockVideoUISpec = nil;
+	self.descriptionSpec = nil;
+	[super viewDidUnload];
 }
 
 - (void)setCamRotate:(id)value specifier:(PSSpecifier *)spec

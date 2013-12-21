@@ -1,5 +1,4 @@
 GO_EASY_ON_ME = 1
-TARGET_IPHONEOS_DEPLOYMENT_VERSION = 5.0
 export ARCHS = armv7 armv7s
 
 include theos/makefiles/common.mk
