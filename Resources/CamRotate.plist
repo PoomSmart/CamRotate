@@ -163,7 +163,7 @@
 		<key>id</key>
 		<string>Description</string>
         <key>footerText</key>
-        <string>• Lock Rotation - Disallow orientation changing in camera.
+        <string>• Lock Orientation - Disallow orientation changing in camera.
         
 • Sync Orientation - Sync camera orientation with system. (By default, even you lock orientation in iDevice, camera still can rotate itself, this one fix that issue.)
 
