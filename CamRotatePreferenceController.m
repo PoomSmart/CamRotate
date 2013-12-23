@@ -3,6 +3,7 @@
 #import <Preferences/PSSpecifier.h>
 
 #define isiOS5 (kCFCoreFoundationVersionNumber >= 675.00 && kCFCoreFoundationVersionNumber < 793.00)
+#define isiOS7 (kCFCoreFoundationVersionNumber > 793.00)
 #define PREF_PATH @"/var/mobile/Library/Preferences/com.PS.CamRotate.plist"
 #define LoadPlist NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_PATH];
 #define PLIST_PATH @"/Library/PreferenceBundles/CamRotateSettings.bundle/CamRotate.plist"
@@ -70,7 +71,7 @@ else \
 	}
 	
 	AddSpecBeforeSpec(self.syncOrientationSpec, [self specifierForID:@"OrientationValue"] ? @"OrientationValue" : @"CamRotateLock")
-	if (!isiOS5) {
+	if (!isiOS5 && !isiOS7) {
 		AddSpecBeforeSpec(self.rotationStyleSpec, @"SyncOrientation")
 		AddSpecBeforeSpec(self.spaceSpec, @"RotationStyle")
 	} else {
@@ -158,7 +159,7 @@ else \
 		if (self.rotationStyleSpec)
 			setAvailable(![[dict objectForKey:@"CamRotateLock"] boolValue], self.rotationStyleSpec)
 		
-		if (isiOS5)
+		if (isiOS5 || isiOS7)
 			[specs removeObject:self.rotationStyleSpec];
 
 		[self reloadSpecifier:self.rotationStyleSpec animated:NO];

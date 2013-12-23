@@ -5,23 +5,32 @@ static BOOL CamRotateLock;
 static BOOL SyncOrientation;
 static BOOL UnlockVideoUI;
 static BOOL unlockVideo = NO;
+static BOOL TFVInstalled;
 
 static int rotationStyle;
 static int orientationValue;
 
 #define isiOS6 (kCFCoreFoundationVersionNumber == 793.00)
 
-@interface PLCameraController
-- (BOOL)isCapturingVideo;
+@interface CAMFlashButton : UIControl
 @end
 
 @interface PLCameraView
+@property(readonly, assign, nonatomic) CAMFlashButton* _flashButton;
+@end
+
+@interface UIView (PhotoLibraryAdditions)
+- (void)pl_setHidden:(BOOL)hidden animated:(BOOL)animated;
+@end
+
+@interface PLCameraController
+- (PLCameraView *)delegate;
+- (BOOL)isCapturingVideo;
 @end
 
 @interface PLUICameraViewController
 - (PLCameraView *)_cameraView;
 @end
-
 
 static void CamRotateLoader()
 {
@@ -70,6 +79,10 @@ static void CamRotateLoader()
 		if ([self isCapturingVideo] && UnlockVideoUI) {
 			unlockVideo = YES;
 			%orig;
+			if (TFVInstalled) {
+				if ([[[NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.PS.ToggleFlashVideo.plist"] objectForKey:@"TFVNative"] boolValue])
+					[[self delegate]._flashButton pl_setHidden:NO animated:NO];
+			}
 			unlockVideo = NO;
 		} else
 			%orig;
@@ -78,6 +91,36 @@ static void CamRotateLoader()
 }
 
 %end
+
+%hook PLCameraView
+
+- (int)_glyphOrientationForCameraOrientation:(int)orientation
+{
+	if (CamRotateisOn) {
+		if (CamRotateLock)
+			return orientationValue;
+		if (SyncOrientation) {
+			UIInterfaceOrientation orient = [[UIDevice currentDevice] orientation];
+			switch (orient) {
+				case UIInterfaceOrientationPortrait:
+					return 1;
+				case UIInterfaceOrientationPortraitUpsideDown:
+					return 2;
+				case UIInterfaceOrientationLandscapeLeft:
+					return 4;
+				case UIInterfaceOrientationLandscapeRight:
+					return 3;
+				default:
+					return %orig;
+			}
+		}
+	}
+	return %orig;
+}
+
+%end
+
+%group iOS6
 
 %hook PLApplicationCameraViewController
 
@@ -129,30 +172,6 @@ static void CamRotateLoader()
 	}
 }
 
-- (int)_glyphOrientationForCameraOrientation:(int)orientation
-{
-	if (CamRotateisOn) {
-		if (CamRotateLock)
-			return orientationValue;
-		if (SyncOrientation) {
-			UIInterfaceOrientation orient = [[UIDevice currentDevice] orientation];
-			switch (orient) {
-				case UIInterfaceOrientationPortrait:
-					return 1;
-				case UIInterfaceOrientationPortraitUpsideDown:
-					return 2;
-				case UIInterfaceOrientationLandscapeLeft:
-					return 4;
-				case UIInterfaceOrientationLandscapeRight:
-					return 3;
-				default:
-					return %orig;
-			}
-		}
-	}
-	return %orig;
-}
-
 %end
 
 %hook PLCameraElapsedTimeView
@@ -167,6 +186,8 @@ static void CamRotateLoader()
 
 %end
 
+%end
+
 static void PostNotification(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
 	CamRotateLoader();
@@ -177,6 +198,13 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 	CamRotateLoader();
-	%init;
+	TFVInstalled = NO;
+	if (isiOS6)
+		%init(iOS6);
+	else {
+		if (dlopen("/Library/MobileSubstrate/DynamicLibraries/ToggleFlashVideo.dylib", RTLD_LAZY) != NULL)
+			TFVInstalled = YES;
+	}
+	%init();
 	[pool drain];
 }
