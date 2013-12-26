@@ -71,7 +71,7 @@ else \
 	}
 	
 	AddSpecBeforeSpec(self.syncOrientationSpec, [self specifierForID:@"OrientationValue"] ? @"OrientationValue" : @"CamRotateLock")
-	if (!isiOS5 && !isiOS7) {
+	if (!isiOS5) {
 		AddSpecBeforeSpec(self.rotationStyleSpec, @"SyncOrientation")
 		AddSpecBeforeSpec(self.spaceSpec, @"RotationStyle")
 	} else {
@@ -159,7 +159,7 @@ else \
 		if (self.rotationStyleSpec)
 			setAvailable(![[dict objectForKey:@"CamRotateLock"] boolValue], self.rotationStyleSpec)
 		
-		if (isiOS5 || isiOS7)
+		if (isiOS5)
 			[specs removeObject:self.rotationStyleSpec];
 
 		[self reloadSpecifier:self.rotationStyleSpec animated:NO];
