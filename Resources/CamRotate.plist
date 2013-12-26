@@ -125,12 +125,14 @@
 			<key>validTitles</key>
 			<array>
 				<string>Default</string>
-				<string>iPad-like</string>
+				<string>iPad-like (For iOS 6)</string>
+				<string>Video-like (For iOS 7)</string>
 			</array>
 			<key>validValues</key>
 			<array>
 				<integer>2</integer>
 				<integer>3</integer>
+				<integer>4</integer>
 			</array>
 		</dict>
 		<dict>
@@ -167,9 +169,10 @@
         
 • Sync Orientation - Sync camera orientation with system. (By default, even you lock orientation in iDevice, camera still can rotate itself, this one fix that issue.)
 
-• Rotation Style (iOS 6 only)
+• Rotation Style (iOS 6 and 7)
 1. Default - Camera-default. (UIs in camera view will fading when they change orientation)
-2. iPad-like - UIs in camera view will rotate around the middle of screen correspond with camera orientation.
+2. iPad-like - iOS 6 only, UIs in camera view will rotate around the middle of screen correspond with camera orientation.
+3. Video-like - iOS 7 only, Camera's Top Bar will rotate just like how the video mode does. (rotate around screen)
 
 • Allow rotation when recording video - Prevent camera from orientation fixed while recording video.
 
