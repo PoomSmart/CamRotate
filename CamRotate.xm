@@ -11,6 +11,7 @@ static int rotationStyle;
 static int orientationValue;
 
 #define isiOS6 (kCFCoreFoundationVersionNumber == 793.00)
+#define isiOS7 (kCFCoreFoundationVersionNumber > 793.00)
 
 @interface CAMFlashButton : UIControl
 @end
@@ -128,7 +129,7 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && isiOS6) {
+		if (rotationStyle == 3) {
 			PLCameraView *view = MSHookIvar<PLCameraView *>(self, "_cameraView");
 			MSHookIvar<int>(view, "_rotationStyle") = -1;
 		}
@@ -143,7 +144,7 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && isiOS6) {
+		if (rotationStyle == 3) {
 			PLCameraView *view = [self _cameraView];
 			MSHookIvar<int>(view, "_rotationStyle") = -1;
 		}
@@ -157,7 +158,7 @@ static void CamRotateLoader()
 - (float)previewImageRotationAngle
 {
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && isiOS6)
+		if (rotationStyle == 3)
 			MSHookIvar<int>(self, "_rotationStyle") = 2;
 	}
 	return %orig;
@@ -167,7 +168,7 @@ static void CamRotateLoader()
 {
 	%orig;
 	if (CamRotateisOn) {
-		if (rotationStyle == 3 && isiOS6)
+		if (rotationStyle == 3)
 			MSHookIvar<int>(self, "_rotationStyle") = -1;
 	}
 }
@@ -188,6 +189,19 @@ static void CamRotateLoader()
 
 %end
 
+%group iOS7
+
+%hook PLCameraView
+
+- (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
+{
+	return CamRotateisOn && rotationStyle == 4 ? YES : %orig;
+}
+
+%end
+
+%end
+
 static void PostNotification(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
 	CamRotateLoader();
@@ -202,8 +216,11 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 	if (isiOS6)
 		%init(iOS6);
 	else {
-		if (dlopen("/Library/MobileSubstrate/DynamicLibraries/ToggleFlashVideo.dylib", RTLD_LAZY) != NULL)
-			TFVInstalled = YES;
+		if (isiOS7) {
+			if (dlopen("/Library/MobileSubstrate/DynamicLibraries/ToggleFlashVideo.dylib", RTLD_LAZY) != NULL)
+				TFVInstalled = YES;
+			%init(iOS7);
+		}
 	}
 	%init();
 	[pool drain];
