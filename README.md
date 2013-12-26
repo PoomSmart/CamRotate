@@ -8,6 +8,7 @@ Description
 
 - Not for iPad.
 - Can fix issue when system orientation and camera orientation are not match by syncing them. (when you lock iDevice orientation)
-- Give you iPad-like rotation style. (UIs rotate around the middle of screen, iOS 6 only)
+- Give you iPad-like (iOS 6) or Video-like (iOS 7) camera UI rotation style. 
 - Can permanently lock camera orientation.
+- Add ability to rotate camera UI while recording video.
 - Compatible with iOS 5, 6 and 7.
