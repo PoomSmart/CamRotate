@@ -24,7 +24,8 @@ static int orientationValue;
 - (void)pl_setHidden:(BOOL)hidden animated:(BOOL)animated;
 @end
 
-@interface PLCameraController
+@interface PLCameraController : NSObject
++ (id)sharedInstance;
 - (PLCameraView *)delegate;
 - (BOOL)isCapturingVideo;
 @end
@@ -196,6 +197,18 @@ static void CamRotateLoader()
 - (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
 {
 	return CamRotateisOn && rotationStyle == 4 ? YES : %orig;
+}
+
+- (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
+{
+	if (CamRotateisOn && rotationStyle == 4) {
+		PLCameraController *cont = [%c(PLCameraController) sharedInstance];
+		int origMode = MSHookIvar<int>(cont, "_cameraMode");
+		MSHookIvar<int>(cont, "_cameraMode") = 1;
+		%orig;
+		MSHookIvar<int>(cont, "_cameraMode") = origMode;
+	} else
+		%orig;
 }
 
 %end
