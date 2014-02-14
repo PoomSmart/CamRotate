@@ -5,7 +5,6 @@ static BOOL CamRotateLock;
 static BOOL SyncOrientation;
 static BOOL UnlockVideoUI;
 static BOOL unlockVideo = NO;
-static BOOL TFVInstalled;
 
 static int rotationStyle;
 static int orientationValue;
@@ -48,14 +47,7 @@ static void CamRotateLoader()
 }
 
 
-%hook UIImage
-
-+ (UIImage *)imageNamed:(NSString *)name inBundle:(NSBundle *)bundle
-{
-	return %orig;
-}
-
-%end
+%group COMMON
 
 %hook PLCameraController
 
@@ -67,29 +59,9 @@ static void CamRotateLoader()
 
 - (BOOL)isCapturingVideo
 {
-	if (CamRotateisOn) {
-		if (UnlockVideoUI && unlockVideo)
-			return NO;
-		return %orig;
-	}
+	if (UnlockVideoUI && unlockVideo)
+		return NO;
 	return %orig;
-}
-
-- (void)accelerometer:(id)accelerometer didChangeDeviceOrientation:(int)orientation
-{
-	if (CamRotateisOn) {
-		if ([self isCapturingVideo] && UnlockVideoUI) {
-			unlockVideo = YES;
-			%orig;
-			if (TFVInstalled) {
-				if ([[[NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.PS.ToggleFlashVideo.plist"] objectForKey:@"TFVNative"] boolValue])
-					[[self delegate]._flashButton pl_setHidden:NO animated:NO];
-			}
-			unlockVideo = NO;
-		} else
-			%orig;
-	} else
-		%orig;
 }
 
 %end
@@ -98,23 +70,21 @@ static void CamRotateLoader()
 
 - (int)_glyphOrientationForCameraOrientation:(int)orientation
 {
-	if (CamRotateisOn) {
-		if (CamRotateLock)
-			return orientationValue;
-		if (SyncOrientation) {
-			UIInterfaceOrientation orient = [[UIDevice currentDevice] orientation];
-			switch (orient) {
-				case UIInterfaceOrientationPortrait:
-					return 1;
-				case UIInterfaceOrientationPortraitUpsideDown:
-					return 2;
-				case UIInterfaceOrientationLandscapeLeft:
-					return 4;
-				case UIInterfaceOrientationLandscapeRight:
-					return 3;
-				default:
-					return %orig;
-			}
+	if (CamRotateLock)
+		return orientationValue;
+	if (SyncOrientation) {
+		UIInterfaceOrientation orient = [[UIDevice currentDevice] orientation];
+		switch (orient) {
+			case UIInterfaceOrientationPortrait:
+				return 1;
+			case UIInterfaceOrientationPortraitUpsideDown:
+				return 2;
+			case UIInterfaceOrientationLandscapeLeft:
+				return 4;
+			case UIInterfaceOrientationLandscapeRight:
+				return 3;
+			default:
+				return %orig;
 		}
 	}
 	return %orig;
@@ -122,18 +92,27 @@ static void CamRotateLoader()
 
 %end
 
+%end
+
 %group iOS6
+
+%hook UIImage
+
++ (UIImage *)imageNamed:(NSString *)name inBundle:(NSBundle *)bundle
+{
+	return %orig;
+}
+
+%end
 
 %hook PLApplicationCameraViewController
 
 - (void)loadView
 {
 	%orig;
-	if (CamRotateisOn) {
-		if (rotationStyle == 3) {
-			PLCameraView *view = MSHookIvar<PLCameraView *>(self, "_cameraView");
-			MSHookIvar<int>(view, "_rotationStyle") = -1;
-		}
+	if (rotationStyle == 3) {
+		PLCameraView *view = MSHookIvar<PLCameraView *>(self, "_cameraView");
+		MSHookIvar<int>(view, "_rotationStyle") = -1;
 	}
 }
 
@@ -144,11 +123,9 @@ static void CamRotateLoader()
 - (void)viewWillAppear:(BOOL)appear
 {
 	%orig;
-	if (CamRotateisOn) {
-		if (rotationStyle == 3) {
-			PLCameraView *view = [self _cameraView];
-			MSHookIvar<int>(view, "_rotationStyle") = -1;
-		}
+	if (rotationStyle == 3) {
+		PLCameraView *view = [self _cameraView];
+		MSHookIvar<int>(view, "_rotationStyle") = -1;
 	}
 }
 
@@ -158,20 +135,16 @@ static void CamRotateLoader()
 
 - (float)previewImageRotationAngle
 {
-	if (CamRotateisOn) {
-		if (rotationStyle == 3)
-			MSHookIvar<int>(self, "_rotationStyle") = 2;
-	}
+	if (rotationStyle == 3)
+		MSHookIvar<int>(self, "_rotationStyle") = 2;
 	return %orig;
 }
 
 - (void)_setupAnimatePreviewDown:(id)down flipImage:(BOOL)image panoImage:(BOOL)image3 snapshotFrame:(CGRect)frame
 {
 	%orig;
-	if (CamRotateisOn) {
-		if (rotationStyle == 3)
-			MSHookIvar<int>(self, "_rotationStyle") = -1;
-	}
+	if (rotationStyle == 3)
+		MSHookIvar<int>(self, "_rotationStyle") = -1;
 }
 
 %end
@@ -180,10 +153,24 @@ static void CamRotateLoader()
 
 - (void)_setDeviceOrientation:(int)orientation animated:(BOOL)animated
 {
-	if (CamRotateisOn) {
-		if (unlockVideo) return;
-	} else
+	if (unlockVideo)
+		return;
+	%orig;
+}
+
+%end
+
+%hook PLCameraController
+
+- (void)accelerometer:(id)accelerometer didChangeDeviceOrientation:(int)orientation
+{
+	if ([self isCapturingVideo] && UnlockVideoUI) {
+		unlockVideo = YES;
 		%orig;
+		unlockVideo = NO;
+		return;
+	}
+	%orig;
 }
 
 %end
@@ -194,21 +181,35 @@ static void CamRotateLoader()
 
 %hook PLCameraView
 
+- (void)_cameraOrientationChanged:(int)orientation
+{
+	unlockVideo = UnlockVideoUI;
+	%orig;
+	unlockVideo = NO;
+}
+
 - (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
 {
-	return CamRotateisOn && rotationStyle == 4 ? YES : %orig;
+	return rotationStyle == 4 ? YES : %orig;
 }
 
 - (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
 {
-	if (CamRotateisOn && rotationStyle == 4) {
-		PLCameraController *cont = [%c(PLCameraController) sharedInstance];
-		int origMode = MSHookIvar<int>(cont, "_cameraMode");
+	unlockVideo = UnlockVideoUI;
+	PLCameraController *cont = [%c(PLCameraController) sharedInstance];
+	int origMode = MSHookIvar<int>(cont, "_cameraMode");
+	if (origMode == 1 || origMode == 2) {
+		%orig;
+		unlockVideo = NO;
+		return;
+	}
+	if (rotationStyle == 4) {
 		MSHookIvar<int>(cont, "_cameraMode") = 1;
 		%orig;
 		MSHookIvar<int>(cont, "_cameraMode") = origMode;
 	} else
 		%orig;
+	unlockVideo = NO;
 }
 
 %end
@@ -217,6 +218,7 @@ static void CamRotateLoader()
 
 static void PostNotification(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
+	system("killall Camera");
 	CamRotateLoader();
 }
 
@@ -225,16 +227,22 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 	CamRotateLoader();
-	TFVInstalled = NO;
-	if (isiOS6)
+	if (!CamRotateisOn) {
+		[pool drain];
+		return;
+	}
+	NSString *ident = [[NSBundle mainBundle] bundleIdentifier];
+	BOOL shouldHook = ([ident isEqualToString:@"com.apple.camera"] || [ident isEqualToString:@"com.apple.springboard"]);
+	if (isiOS6) {
 		%init(iOS6);
+	}
 	else {
-		if (isiOS7) {
-			if (dlopen("/Library/MobileSubstrate/DynamicLibraries/ToggleFlashVideo.dylib", RTLD_LAZY) != NULL)
-				TFVInstalled = YES;
+		if (isiOS7 && shouldHook) {
 			%init(iOS7);
 		}
 	}
-	%init();
+	if (!isiOS7 && !shouldHook) {
+		%init(COMMON);
+	}
 	[pool drain];
 }
