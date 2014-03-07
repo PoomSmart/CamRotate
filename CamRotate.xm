@@ -17,6 +17,7 @@ static int orientationValue;
 
 @interface PLCameraView
 @property(readonly, assign, nonatomic) CAMFlashButton* _flashButton;
+- (void)_rotateCameraControlsAndInterface;
 @end
 
 @interface UIView (PhotoLibraryAdditions)
@@ -181,11 +182,22 @@ static void CamRotateLoader()
 
 %hook PLCameraView
 
+- (void)_updateEnabledControlsWithReason:(id)reason forceLog:(BOOL)log
+{
+	%orig;
+	if (CamRotateLock)
+		[self _rotateCameraControlsAndInterface];
+}
+
 - (void)_cameraOrientationChanged:(int)orientation
 {
-	unlockVideo = UnlockVideoUI;
+	if ([[%c(PLCameraController) sharedInstance] isCapturingVideo] && UnlockVideoUI) {
+		unlockVideo = YES;
+		%orig;
+		unlockVideo = NO;
+		return;
+	}
 	%orig;
-	unlockVideo = NO;
 }
 
 - (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
@@ -241,8 +253,6 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 			%init(iOS7);
 		}
 	}
-	if (!isiOS7 && !shouldHook) {
-		%init(COMMON);
-	}
+	%init(COMMON);
 	[pool drain];
 }
