@@ -10,12 +10,18 @@ static int rotationStyle;
 static int orientationValue;
 
 #define isiOS6 (kCFCoreFoundationVersionNumber == 793.00)
-#define isiOS7 (kCFCoreFoundationVersionNumber > 793.00)
+#define isiOS7 (kCFCoreFoundationVersionNumber > 793.00 && kCFCoreFoundationVersionNumber < 1140.0)
+#define isiOS8 (kCFCoreFoundationVersionNumber >= 1140.0)
 
 @interface CAMFlashButton : UIControl
 @end
 
 @interface PLCameraView
+@property(readonly, assign, nonatomic) CAMFlashButton* _flashButton;
+- (void)_rotateCameraControlsAndInterface;
+@end
+
+@interface CAMCameraView
 @property(readonly, assign, nonatomic) CAMFlashButton* _flashButton;
 - (void)_rotateCameraControlsAndInterface;
 @end
@@ -27,6 +33,12 @@ static int orientationValue;
 @interface PLCameraController : NSObject
 + (id)sharedInstance;
 - (PLCameraView *)delegate;
+- (BOOL)isCapturingVideo;
+@end
+
+@interface CAMCameraController : NSObject
++ (id)sharedInstance;
+- (CAMCameraView *)delegate;
 - (BOOL)isCapturingVideo;
 @end
 
@@ -50,7 +62,7 @@ static void CamRotateLoader()
 
 %group COMMON
 
-%hook PLCameraController
+%hook CameraController
 
 %new
 - (BOOL)isSyncOrientation
@@ -67,7 +79,7 @@ static void CamRotateLoader()
 
 %end
 
-%hook PLCameraView
+%hook CameraView
 
 - (int)_glyphOrientationForCameraOrientation:(int)orientation
 {
@@ -178,9 +190,9 @@ static void CamRotateLoader()
 
 %end
 
-%group iOS7
+%group iOS78
 
-%hook PLCameraView
+%hook CameraView
 
 - (void)_updateEnabledControlsWithReason:(id)reason forceLog:(BOOL)log
 {
@@ -208,7 +220,9 @@ static void CamRotateLoader()
 - (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
 {
 	unlockVideo = UnlockVideoUI;
-	PLCameraController *cont = [%c(PLCameraController) sharedInstance];
+	id cont;
+	Class CameraController = isiOS8 ? objc_getClass("CAMCameraController") : objc_getClass("PLCameraController");
+	cont = [CameraController sharedInstance];
 	int origMode = MSHookIvar<int>(cont, "_cameraMode");
 	if (origMode == 1 || origMode == 2) {
 		%orig;
@@ -239,20 +253,19 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 	CamRotateLoader();
-	if (!CamRotateisOn) {
-		[pool drain];
-		return;
-	}
-	NSString *ident = [[NSBundle mainBundle] bundleIdentifier];
-	BOOL shouldHook = ([ident isEqualToString:@"com.apple.camera"] || [ident isEqualToString:@"com.apple.springboard"]);
-	if (isiOS6) {
-		%init(iOS6);
-	}
-	else {
-		if (isiOS7 && shouldHook) {
-			%init(iOS7);
+	if (CamRotateisOn) {
+		NSString *ident = [[NSBundle mainBundle] bundleIdentifier];
+		BOOL shouldHook = ([ident isEqualToString:@"com.apple.camera"] || [ident isEqualToString:@"com.apple.springboard"]);
+		Class CameraView = isiOS8 ? objc_getClass("CAMCameraView") : objc_getClass("PLCameraView");
+		Class CameraController = isiOS8 ? objc_getClass("CAMCameraController") : objc_getClass("PLCameraController");
+		if (isiOS6) {
+			%init(iOS6);
+		} else {
+			if ((isiOS7 || isiOS8) && shouldHook) {
+				%init(iOS78, CameraView = CameraView);
+			}
 		}
+		%init(COMMON, CameraView = CameraView, CameraController = CameraController);
 	}
-	%init(COMMON);
 	[pool drain];
 }
