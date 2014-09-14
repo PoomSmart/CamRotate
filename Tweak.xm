@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import "../PS.h"
 
 static BOOL CamRotateisOn;
 static BOOL CamRotateLock;
@@ -8,10 +9,6 @@ static BOOL unlockVideo = NO;
 
 static int rotationStyle;
 static int orientationValue;
-
-#define isiOS6 (kCFCoreFoundationVersionNumber == 793.00)
-#define isiOS7 (kCFCoreFoundationVersionNumber > 793.00 && kCFCoreFoundationVersionNumber < 1140.0)
-#define isiOS8 (kCFCoreFoundationVersionNumber >= 1140.0)
 
 @interface CAMFlashButton : UIControl
 @end
