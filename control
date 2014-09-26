@@ -1,7 +1,6 @@
 Package: org.thebigboss.camrotate
 Name: CamRotate
 Depends: mobilesubstrate, preferenceloader, firmware (>= 5.0), gsc.still-camera | gsc.front-facing-camera
-Conflicts: gsc.ipad
 Version: 1.1
 Architecture: iphoneos-arm
 Description: rotate camera interface in the way you like.

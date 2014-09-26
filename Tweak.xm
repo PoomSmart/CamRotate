@@ -14,12 +14,12 @@ static int orientationValue;
 @end
 
 @interface PLCameraView
-@property(readonly, assign, nonatomic) CAMFlashButton* _flashButton;
+@property(readonly, assign, nonatomic) CAMFlashButton *_flashButton;
 - (void)_rotateCameraControlsAndInterface;
 @end
 
 @interface CAMCameraView
-@property(readonly, assign, nonatomic) CAMFlashButton* _flashButton;
+@property(readonly, assign, nonatomic) CAMFlashButton *_flashButton;
 - (void)_rotateCameraControlsAndInterface;
 @end
 
@@ -33,7 +33,7 @@ static int orientationValue;
 - (BOOL)isCapturingVideo;
 @end
 
-@interface CAMCameraController : NSObject
+@interface CAMCaptureController : NSObject
 + (id)sharedInstance;
 - (CAMCameraView *)delegate;
 - (BOOL)isCapturingVideo;
@@ -218,7 +218,7 @@ static void CamRotateLoader()
 {
 	unlockVideo = UnlockVideoUI;
 	id cont;
-	Class CameraController = isiOS8 ? objc_getClass("CAMCameraController") : objc_getClass("PLCameraController");
+	Class CameraController = isiOS8 ? objc_getClass("CAMCaptureController") : objc_getClass("PLCameraController");
 	cont = [CameraController sharedInstance];
 	int origMode = MSHookIvar<int>(cont, "_cameraMode");
 	if (origMode == 1 || origMode == 2) {
@@ -254,7 +254,7 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 		NSString *ident = [[NSBundle mainBundle] bundleIdentifier];
 		BOOL shouldHook = ([ident isEqualToString:@"com.apple.camera"] || [ident isEqualToString:@"com.apple.springboard"]);
 		Class CameraView = isiOS8 ? objc_getClass("CAMCameraView") : objc_getClass("PLCameraView");
-		Class CameraController = isiOS8 ? objc_getClass("CAMCameraController") : objc_getClass("PLCameraController");
+		Class CameraController = isiOS8 ? objc_getClass("CAMCaptureController") : objc_getClass("PLCameraController");
 		if (isiOS6) {
 			%init(iOS6);
 		} else {
