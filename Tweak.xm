@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
-#import "../PS.h"
+#import "Header.h"
 
 static BOOL CamRotateisOn;
 static BOOL CamRotateLock;
@@ -23,10 +23,6 @@ static int orientationValue;
 - (void)_rotateCameraControlsAndInterface;
 @end
 
-@interface UIView (PhotoLibraryAdditions)
-- (void)pl_setHidden:(BOOL)hidden animated:(BOOL)animated;
-@end
-
 @interface PLCameraController : NSObject
 + (id)sharedInstance;
 - (PLCameraView *)delegate;
@@ -45,14 +41,14 @@ static int orientationValue;
 
 static void CamRotateLoader()
 {
-	NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.PS.CamRotate.plist"];
-	CamRotateisOn = [[dict objectForKey:@"CamRotateEnabled"] boolValue];
-	CamRotateLock = [[dict objectForKey:@"CamRotateLock"] boolValue];
-	SyncOrientation = [[dict objectForKey:@"SyncOrientation"] boolValue];
-	UnlockVideoUI = [[dict objectForKey:@"UnlockVideoUI"] boolValue];
-	id RotationStyle = [dict objectForKey:@"RotationStyle"];
+	NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_PATH];
+	CamRotateisOn = [dict[@"CamRotateEnabled"] boolValue];
+	CamRotateLock = [dict[@"CamRotateLock"] boolValue];
+	SyncOrientation = [dict[@"SyncOrientation"] boolValue];
+	UnlockVideoUI = [dict[@"UnlockVideoUI"] boolValue];
+	id RotationStyle = dict[@"RotationStyle"];
 	rotationStyle = RotationStyle ? [RotationStyle integerValue] : 2;
-	id OrientationValue = [dict objectForKey:@"OrientationValue"];
+	id OrientationValue = dict[@"OrientationValue"];
 	orientationValue = OrientationValue ? [OrientationValue integerValue] : 1;
 }
 
@@ -105,15 +101,6 @@ static void CamRotateLoader()
 %end
 
 %group iOS6
-
-%hook UIImage
-
-+ (UIImage *)imageNamed:(NSString *)name inBundle:(NSBundle *)bundle
-{
-	return %orig;
-}
-
-%end
 
 %hook PLApplicationCameraViewController
 
@@ -200,7 +187,8 @@ static void CamRotateLoader()
 
 - (void)_cameraOrientationChanged:(int)orientation
 {
-	if ([[%c(PLCameraController) sharedInstance] isCapturingVideo] && UnlockVideoUI) {
+	id cont = MSHookIvar<id>(self, "_cameraController");
+	if ([cont isCapturingVideo] && UnlockVideoUI) {
 		unlockVideo = YES;
 		%orig;
 		unlockVideo = NO;
@@ -217,9 +205,7 @@ static void CamRotateLoader()
 - (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
 {
 	unlockVideo = UnlockVideoUI;
-	id cont;
-	Class CameraController = isiOS8 ? objc_getClass("CAMCaptureController") : objc_getClass("PLCameraController");
-	cont = [CameraController sharedInstance];
+	id cont = MSHookIvar<id>(self, "_cameraController");
 	int origMode = MSHookIvar<int>(cont, "_cameraMode");
 	if (origMode == 1 || origMode == 2) {
 		%orig;
@@ -251,14 +237,14 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 	CamRotateLoader();
 	if (CamRotateisOn) {
-		NSString *ident = [[NSBundle mainBundle] bundleIdentifier];
-		BOOL shouldHook = ([ident isEqualToString:@"com.apple.camera"] || [ident isEqualToString:@"com.apple.springboard"]);
+		dlopen("/System/Library/PrivateFrameworks/PhotoLibrary.framework/PhotoLibrary", RTLD_LAZY);
+		dlopen("/System/Library/PrivateFrameworks/CameraKit.framework/CameraKit", RTLD_LAZY);
 		Class CameraView = isiOS8 ? objc_getClass("CAMCameraView") : objc_getClass("PLCameraView");
 		Class CameraController = isiOS8 ? objc_getClass("CAMCaptureController") : objc_getClass("PLCameraController");
 		if (isiOS6) {
 			%init(iOS6);
 		} else {
-			if ((isiOS7 || isiOS8) && shouldHook) {
+			if (isiOS7 || isiOS8) {
 				%init(iOS78, CameraView = CameraView);
 			}
 		}

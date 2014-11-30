@@ -18,18 +18,12 @@
       <dict>
         <key>cell</key>
         <string>PSSwitchCell</string>
-        <key>alternateColors</key>
-        <true/>
         <key>default</key>
         <false/>
         <key>defaults</key>
         <string>com.PS.CamRotate</string>
         <key>key</key>
         <string>CamRotateEnabled</string>
-        <key>id</key>
-		<string>CamRotate</string>
-		<key>set</key>
-        <string>setCamRotate:specifier:</string>
         <key>label</key>
         <string>Enabled</string>
         <key>PostNotification</key>
@@ -44,10 +38,6 @@
         <string>com.PS.CamRotate</string>
         <key>key</key>
         <string>CamRotateLock</string>
-        <key>id</key>
-		<string>CamRotateLock</string>
-        <key>set</key>
-        <string>setCamRotateLock:specifier:</string>
         <key>label</key>
         <string>Lock Orientation</string>
         <key>PostNotification</key>
@@ -63,8 +53,6 @@
 			<key>detail</key>
 			<string>PSListItemsController</string>
 			<key>key</key>
-			<string>OrientationValue</string>
-			<key>id</key>
 			<string>OrientationValue</string>
 			<key>label</key>
 			<string>Orientation</string>
@@ -94,10 +82,6 @@
         <string>com.PS.CamRotate</string>
         <key>key</key>
         <string>SyncOrientation</string>
-        <key>id</key>
-		<string>SyncOrientation</string>
-        <key>set</key>
-        <string>setSyncOrientation:specifier:</string>
         <key>label</key>
         <string>Sync Orientation</string>
         <key>PostNotification</key>
@@ -112,8 +96,6 @@
 			<string>PSListItemsController</string>
 			<key>key</key>
 			<string>RotationStyle</string>
-			<key>set</key>
-			<string>killCam:specifier:</string>
 			<key>id</key>
 			<string>RotationStyle</string>
 			<key>enabled</key>
@@ -138,8 +120,6 @@
 		<dict>
         <key>cell</key>
         <string>PSGroupCell</string>
-        <key>id</key>
-		<string>space</string>
         <key>label</key>
         <string>Allow rotation when recording video</string>
         </dict>
@@ -152,8 +132,6 @@
         <string>com.PS.CamRotate</string>
         <key>key</key>
         <string>UnlockVideoUI</string>
-        <key>id</key>
-		<string>UnlockVideoUI</string>
         <key>label</key>
         <string>Enabled</string>
         <key>PostNotification</key>
@@ -169,14 +147,20 @@
         
 • Sync Orientation - Sync camera orientation with system. (By default, even you lock orientation in iDevice, camera still can rotate itself, this one fix that issue.)
 
-• Rotation Style (iOS 6 and 7)
+• Rotation Style (iOS 6+)
 1. Default - Camera-default. (UIs in camera view will fading when they change orientation)
-2. iPad-like - iOS 6 only, UIs in camera view will rotate around the middle of screen correspond with camera orientation.
-3. Video-like - iOS 7 only, Camera's Top Bar will rotate just like how the video mode does. (rotate around screen)
+2. iPad-like - iOS 6, UIs in camera view will rotate around the middle of screen correspond with camera orientation.
+3. Video-like - iOS 7+, Camera's Top Bar will rotate just like how the video mode does. (rotate around screen)
 
-• Allow rotation when recording video - Prevent camera from orientation fixed while recording video.
-
-© 2013 - 2014 Thuchapol Unprasert
+• Allow rotation when recording video - Prevent camera from orientation fixed while recording video.</string>
+      </dict>
+       <dict>
+        <key>cell</key>
+        <string>PSGroupCell</string>
+        <key>footerAlignment</key>
+        <integer>1</integer>
+        <key>footerText</key>
+        <string>© 2013 - 2014 Thatchapon Unprasert
 (@PoomSmart)</string>
       </dict>
     </array>
