@@ -108,7 +108,7 @@
 			<array>
 				<string>Default</string>
 				<string>iPad-like (For iOS 6)</string>
-				<string>Video-like (For iOS 7)</string>
+				<string>Video-like (For iOS 7+)</string>
 			</array>
 			<key>validValues</key>
 			<array>

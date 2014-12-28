@@ -52,29 +52,7 @@ static void CamRotateLoader()
 	orientationValue = OrientationValue ? [OrientationValue integerValue] : 1;
 }
 
-
-%group COMMON
-
-%hook CameraController
-
-%new
-- (BOOL)isSyncOrientation
-{
-	return SyncOrientation;
-}
-
-- (BOOL)isCapturingVideo
-{
-	if (UnlockVideoUI && unlockVideo)
-		return NO;
-	return %orig;
-}
-
-%end
-
-%hook CameraView
-
-- (int)_glyphOrientationForCameraOrientation:(int)orientation
+static int glyphOrientationOverride(int orientation, int orig)
 {
 	if (CamRotateLock)
 		return orientationValue;
@@ -90,15 +68,12 @@ static void CamRotateLoader()
 			case UIInterfaceOrientationLandscapeRight:
 				return 3;
 			default:
-				return %orig;
+				return orig;
 		}
 	}
-	return %orig;
+	return orig;
 }
 
-%end
-
-%end
 
 %group iOS6
 
@@ -174,9 +149,39 @@ static void CamRotateLoader()
 
 %end
 
-%group iOS78
+%group preiOS8
 
-%hook CameraView
+%hook PLCameraView
+
+- (int)_glyphOrientationForCameraOrientation:(int)orientation
+{
+	return glyphOrientationOverride(orientation, %orig);
+}
+
+%end
+
+%hook PLCameraController
+
+%new
+- (BOOL)isSyncOrientation
+{
+	return SyncOrientation;
+}
+
+- (BOOL)isCapturingVideo
+{
+	if (UnlockVideoUI && unlockVideo)
+		return NO;
+	return %orig;
+}
+
+%end
+
+%end
+
+%group iOS7
+
+%hook PLCameraView
 
 - (void)_updateEnabledControlsWithReason:(id)reason forceLog:(BOOL)log
 {
@@ -205,7 +210,80 @@ static void CamRotateLoader()
 - (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
 {
 	unlockVideo = UnlockVideoUI;
-	id cont = MSHookIvar<id>(self, "_cameraController");
+	PLCameraController *cont = MSHookIvar<PLCameraController *>(self, "_cameraController");
+	int origMode = MSHookIvar<int>(cont, "_cameraMode");
+	if (origMode == 1 || origMode == 2) {
+		%orig;
+		unlockVideo = NO;
+		return;
+	}
+	if (rotationStyle == 4) {
+		MSHookIvar<int>(cont, "_cameraMode") = 1;
+		%orig;
+		MSHookIvar<int>(cont, "_cameraMode") = origMode;
+	} else
+		%orig;
+	unlockVideo = NO;
+}
+
+%end
+
+%end
+
+%group iOS8
+
+%hook CAMCaptureController
+
+%new
+- (BOOL)isSyncOrientation
+{
+	return SyncOrientation;
+}
+
+- (BOOL)isCapturingVideo
+{
+	if (UnlockVideoUI && unlockVideo)
+		return NO;
+	return %orig;
+}
+
+%end
+
+%hook CAMCameraView
+
+- (int)_glyphOrientationForCameraOrientation:(int)orientation
+{
+	return glyphOrientationOverride(orientation, %orig);
+}
+
+- (void)_updateEnabledControlsWithReason:(id)reason forceLog:(BOOL)log
+{
+	%orig;
+	if (CamRotateLock)
+		[self _rotateCameraControlsAndInterface];
+}
+
+- (void)_cameraOrientationChanged:(int)orientation
+{
+	CAMCaptureController *cont = MSHookIvar<CAMCaptureController *>(self, "_cameraController");
+	if ([cont isCapturingVideo] && UnlockVideoUI) {
+		unlockVideo = YES;
+		%orig;
+		unlockVideo = NO;
+		return;
+	}
+	%orig;
+}
+
+- (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
+{
+	return rotationStyle == 4 ? YES : %orig;
+}
+
+- (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
+{
+	unlockVideo = UnlockVideoUI;
+	CAMCaptureController *cont = MSHookIvar<CAMCaptureController *>(self, "_cameraController");
 	int origMode = MSHookIvar<int>(cont, "_cameraMode");
 	if (origMode == 1 || origMode == 2) {
 		%orig;
@@ -239,16 +317,17 @@ static void PostNotification(CFNotificationCenterRef center, void *observer, CFS
 	if (CamRotateisOn) {
 		dlopen("/System/Library/PrivateFrameworks/PhotoLibrary.framework/PhotoLibrary", RTLD_LAZY);
 		dlopen("/System/Library/PrivateFrameworks/CameraKit.framework/CameraKit", RTLD_LAZY);
-		Class CameraView = isiOS8 ? objc_getClass("CAMCameraView") : objc_getClass("PLCameraView");
-		Class CameraController = isiOS8 ? objc_getClass("CAMCaptureController") : objc_getClass("PLCameraController");
-		if (isiOS6) {
-			%init(iOS6);
+		if (isiOS8Up) {
+			%init(iOS8);
 		} else {
-			if (isiOS7 || isiOS8) {
-				%init(iOS78, CameraView = CameraView);
+			%init(preiOS8);
+			if (isiOS6) {
+				%init(iOS6);
+			}
+			if (isiOS7) {
+				%init(iOS7);
 			}
 		}
-		%init(COMMON, CameraView = CameraView, CameraController = CameraController);
 	}
 	[pool drain];
 }
