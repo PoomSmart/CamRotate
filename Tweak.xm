@@ -136,13 +136,9 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 - (void)accelerometer:(id)accelerometer didChangeDeviceOrientation:(int)orientation
 {
-	if ([self isCapturingVideo] && UnlockVideoUI) {
-		unlockVideo = YES;
-		%orig;
-		unlockVideo = NO;
-		return;
-	}
+	unlockVideo = [self isCapturingVideo] && UnlockVideoUI;
 	%orig;
+	unlockVideo = NO;
 }
 
 %end
@@ -170,9 +166,7 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 - (BOOL)isCapturingVideo
 {
-	if (UnlockVideoUI && unlockVideo)
-		return NO;
-	return %orig;
+	return UnlockVideoUI && unlockVideo ? NO : %orig;
 }
 
 %end
@@ -192,14 +186,10 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 - (void)_cameraOrientationChanged:(int)orientation
 {
-	id cont = MSHookIvar<id>(self, "_cameraController");
-	if ([cont isCapturingVideo] && UnlockVideoUI) {
-		unlockVideo = YES;
-		%orig;
-		unlockVideo = NO;
-		return;
-	}
+	PLCameraController *cont = MSHookIvar<PLCameraController *>(self, "_cameraController");
+	unlockVideo = [cont isCapturingVideo] && UnlockVideoUI;
 	%orig;
+	unlockVideo = NO;
 }
 
 - (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
@@ -209,21 +199,17 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 - (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
 {
-	unlockVideo = UnlockVideoUI;
 	PLCameraController *cont = MSHookIvar<PLCameraController *>(self, "_cameraController");
-	int origMode = MSHookIvar<int>(cont, "_cameraMode");
-	if (origMode == 1 || origMode == 2) {
-		%orig;
-		unlockVideo = NO;
-		return;
-	}
-	if (rotationStyle == 4) {
-		MSHookIvar<int>(cont, "_cameraMode") = 1;
+	if (cont) {
+		unlockVideo = UnlockVideoUI;
+		int origMode = MSHookIvar<int>(cont, "_cameraMode");
+		if (rotationStyle == 4)
+			MSHookIvar<int>(cont, "_cameraMode") = 1;
 		%orig;
 		MSHookIvar<int>(cont, "_cameraMode") = origMode;
+		unlockVideo = NO;
 	} else
 		%orig;
-	unlockVideo = NO;
 }
 
 %end
@@ -242,9 +228,7 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 - (BOOL)isCapturingVideo
 {
-	if (UnlockVideoUI && unlockVideo)
-		return NO;
-	return %orig;
+	return UnlockVideoUI && unlockVideo ? NO : %orig;
 }
 
 %end
@@ -266,13 +250,9 @@ static int glyphOrientationOverride(int orientation, int orig)
 - (void)_cameraOrientationChanged:(int)orientation
 {
 	CAMCaptureController *cont = MSHookIvar<CAMCaptureController *>(self, "_cameraController");
-	if ([cont isCapturingVideo] && UnlockVideoUI) {
-		unlockVideo = YES;
-		%orig;
-		unlockVideo = NO;
-		return;
-	}
+	unlockVideo = [cont isCapturingVideo] && UnlockVideoUI;
 	%orig;
+	unlockVideo = NO;
 }
 
 - (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
@@ -282,21 +262,17 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 - (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
 {
-	unlockVideo = UnlockVideoUI;
 	CAMCaptureController *cont = MSHookIvar<CAMCaptureController *>(self, "_cameraController");
-	int origMode = MSHookIvar<int>(cont, "_cameraMode");
-	if (origMode == 1 || origMode == 2) {
-		%orig;
-		unlockVideo = NO;
-		return;
-	}
-	if (rotationStyle == 4) {
-		MSHookIvar<int>(cont, "_cameraMode") = 1;
+	if (cont) {
+		unlockVideo = UnlockVideoUI;
+		int origMode = MSHookIvar<int>(cont, "_cameraMode");
+		if (rotationStyle == 4)
+			MSHookIvar<int>(cont, "_cameraMode") = 1;
 		%orig;
 		MSHookIvar<int>(cont, "_cameraMode") = origMode;
+		unlockVideo = NO;
 	} else
 		%orig;
-	unlockVideo = NO;
 }
 
 %end
