@@ -4,13 +4,7 @@
 #import "Header.h"
 
 @interface CamRotatePreferenceController : PSListController
-@property (nonatomic, retain) PSSpecifier *camRotateLockSpec;
-@property (nonatomic, retain) PSSpecifier *orientationSpec;
-@property (nonatomic, retain) PSSpecifier *syncOrientationSpec;
 @property (nonatomic, retain) PSSpecifier *rotationStyleSpec;
-@property (nonatomic, retain) PSSpecifier *spaceSpec;
-@property (nonatomic, retain) PSSpecifier *unlockVideoUISpec;
-@property (nonatomic, retain) PSSpecifier *descriptionSpec;
 @end
 
 @implementation CamRotatePreferenceController
@@ -39,7 +33,7 @@
 		NSMutableArray *specs = [NSMutableArray arrayWithArray:[self loadSpecifiersFromPlistName:@"CamRotate" target:self]];
 		
 		for (PSSpecifier *spec in specs) {
-			NSString *Id = [[spec properties] objectForKey:@"id"];
+			NSString *Id = [spec identifier];
 			if ([Id isEqualToString:@"RotationStyle"])
 				self.rotationStyleSpec = spec;
 		}

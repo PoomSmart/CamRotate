@@ -7,37 +7,8 @@ static BOOL SyncOrientation;
 static BOOL UnlockVideoUI;
 static BOOL unlockVideo = NO;
 
-static int rotationStyle;
-static int orientationValue;
-
-@interface CAMFlashButton : UIControl
-@end
-
-@interface PLCameraView
-@property(readonly, assign, nonatomic) CAMFlashButton *_flashButton;
-- (void)_rotateCameraControlsAndInterface;
-@end
-
-@interface CAMCameraView
-@property(readonly, assign, nonatomic) CAMFlashButton *_flashButton;
-- (void)_rotateCameraControlsAndInterface;
-@end
-
-@interface PLCameraController : NSObject
-+ (id)sharedInstance;
-- (PLCameraView *)delegate;
-- (BOOL)isCapturingVideo;
-@end
-
-@interface CAMCaptureController : NSObject
-+ (id)sharedInstance;
-- (CAMCameraView *)delegate;
-- (BOOL)isCapturingVideo;
-@end
-
-@interface PLUICameraViewController
-- (PLCameraView *)_cameraView;
-@end
+static NSInteger rotationStyle;
+static NSInteger orientationValue;
 
 static void CamRotateLoader()
 {
@@ -52,7 +23,7 @@ static void CamRotateLoader()
 	orientationValue = OrientationValue ? [OrientationValue integerValue] : 1;
 }
 
-static int glyphOrientationOverride(int orientation, int orig)
+static NSInteger glyphOrientationOverride(NSInteger orientation, NSInteger orig)
 {
 	if (CamRotateLock)
 		return orientationValue;
@@ -74,7 +45,6 @@ static int glyphOrientationOverride(int orientation, int orig)
 	return orig;
 }
 
-
 %group iOS6
 
 %hook PLApplicationCameraViewController
@@ -84,7 +54,7 @@ static int glyphOrientationOverride(int orientation, int orig)
 	%orig;
 	if (rotationStyle == 3) {
 		PLCameraView *view = MSHookIvar<PLCameraView *>(self, "_cameraView");
-		MSHookIvar<int>(view, "_rotationStyle") = -1;
+		MSHookIvar<NSInteger>(view, "_rotationStyle") = -1;
 	}
 }
 
@@ -97,7 +67,7 @@ static int glyphOrientationOverride(int orientation, int orig)
 	%orig;
 	if (rotationStyle == 3) {
 		PLCameraView *view = [self _cameraView];
-		MSHookIvar<int>(view, "_rotationStyle") = -1;
+		MSHookIvar<NSInteger>(view, "_rotationStyle") = -1;
 	}
 }
 
@@ -105,10 +75,10 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 %hook PLCameraView
 
-- (float)previewImageRotationAngle
+- (CGFloat)previewImageRotationAngle
 {
 	if (rotationStyle == 3)
-		MSHookIvar<int>(self, "_rotationStyle") = 2;
+		MSHookIvar<NSInteger>(self, "_rotationStyle") = 2;
 	return %orig;
 }
 
@@ -116,14 +86,14 @@ static int glyphOrientationOverride(int orientation, int orig)
 {
 	%orig;
 	if (rotationStyle == 3)
-		MSHookIvar<int>(self, "_rotationStyle") = -1;
+		MSHookIvar<NSInteger>(self, "_rotationStyle") = -1;
 }
 
 %end
 
 %hook PLCameraElapsedTimeView
 
-- (void)_setDeviceOrientation:(int)orientation animated:(BOOL)animated
+- (void)_setDeviceOrientation:(NSInteger)orientation animated:(BOOL)animated
 {
 	if (unlockVideo)
 		return;
@@ -134,7 +104,7 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 %hook PLCameraController
 
-- (void)accelerometer:(id)accelerometer didChangeDeviceOrientation:(int)orientation
+- (void)accelerometer:(id)accelerometer didChangeDeviceOrientation:(NSInteger)orientation
 {
 	unlockVideo = [self isCapturingVideo] && UnlockVideoUI;
 	%orig;
@@ -149,7 +119,7 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 %hook PLCameraView
 
-- (int)_glyphOrientationForCameraOrientation:(int)orientation
+- (NSInteger)_glyphOrientationForCameraOrientation:(NSInteger)orientation
 {
 	return glyphOrientationOverride(orientation, %orig);
 }
@@ -184,29 +154,29 @@ static int glyphOrientationOverride(int orientation, int orig)
 		[self _rotateCameraControlsAndInterface];
 }
 
-- (void)_cameraOrientationChanged:(int)orientation
+- (void)_cameraOrientationChanged:(NSInteger)orientation
 {
-	PLCameraController *cont = MSHookIvar<PLCameraController *>(self, "_cameraController");
+	PLCameraController *cont = [%c(PLCameraController) sharedInstance];
 	unlockVideo = [cont isCapturingVideo] && UnlockVideoUI;
 	%orig;
 	unlockVideo = NO;
 }
 
-- (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
+- (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(NSInteger)orientation cameraMode:(NSInteger)mode
 {
 	return rotationStyle == 4 ? YES : %orig;
 }
 
-- (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
+- (void)_updateTopBarStyleForDeviceOrientation:(NSInteger)orientation
 {
-	PLCameraController *cont = MSHookIvar<PLCameraController *>(self, "_cameraController");
+	PLCameraController *cont = [%c(PLCameraController) sharedInstance];
 	if (cont) {
 		unlockVideo = UnlockVideoUI;
-		int origMode = MSHookIvar<int>(cont, "_cameraMode");
+		NSInteger origMode = MSHookIvar<NSInteger>(cont, "_cameraMode");
 		if (rotationStyle == 4)
-			MSHookIvar<int>(cont, "_cameraMode") = 1;
+			MSHookIvar<NSInteger>(cont, "_cameraMode") = 1;
 		%orig;
-		MSHookIvar<int>(cont, "_cameraMode") = origMode;
+		MSHookIvar<NSInteger>(cont, "_cameraMode") = origMode;
 		unlockVideo = NO;
 	} else
 		%orig;
@@ -235,7 +205,7 @@ static int glyphOrientationOverride(int orientation, int orig)
 
 %hook CAMCameraView
 
-- (int)_glyphOrientationForCameraOrientation:(int)orientation
+- (NSInteger)_glyphOrientationForCameraOrientation:(NSInteger)orientation
 {
 	return glyphOrientationOverride(orientation, %orig);
 }
@@ -247,29 +217,29 @@ static int glyphOrientationOverride(int orientation, int orig)
 		[self _rotateCameraControlsAndInterface];
 }
 
-- (void)_cameraOrientationChanged:(int)orientation
+- (void)_cameraOrientationChanged:(NSInteger)orientation
 {
-	CAMCaptureController *cont = MSHookIvar<CAMCaptureController *>(self, "_cameraController");
+	CAMCaptureController *cont = [%c(CAMCaptureController) sharedInstance];
 	unlockVideo = [cont isCapturingVideo] && UnlockVideoUI;
 	%orig;
 	unlockVideo = NO;
 }
 
-- (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
+- (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(NSInteger)orientation cameraMode:(NSInteger)mode
 {
 	return rotationStyle == 4 ? YES : %orig;
 }
 
-- (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
+- (void)_updateTopBarStyleForDeviceOrientation:(NSInteger)orientation
 {
-	CAMCaptureController *cont = MSHookIvar<CAMCaptureController *>(self, "_cameraController");
+	CAMCaptureController *cont = [%c(CAMCaptureController) sharedInstance];
 	if (cont) {
 		unlockVideo = UnlockVideoUI;
-		int origMode = MSHookIvar<int>(cont, "_cameraMode");
+		NSInteger origMode = MSHookIvar<NSInteger>(cont, "_cameraMode");
 		if (rotationStyle == 4)
-			MSHookIvar<int>(cont, "_cameraMode") = 1;
+			MSHookIvar<NSInteger>(cont, "_cameraMode") = 1;
 		%orig;
-		MSHookIvar<int>(cont, "_cameraMode") = origMode;
+		MSHookIvar<NSInteger>(cont, "_cameraMode") = origMode;
 		unlockVideo = NO;
 	} else
 		%orig;
