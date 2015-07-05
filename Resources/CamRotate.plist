@@ -17,6 +17,12 @@
     <array>
       <dict>
         <key>cell</key>
+        <string>PSGroupCell</string>
+        <key>label</key>
+        <string>Kill switch</string>
+    </dict>
+    <dict>
+        <key>cell</key>
         <string>PSSwitchCell</string>
         <key>default</key>
         <false/>
@@ -29,6 +35,12 @@
         <key>PostNotification</key>
         <string>com.PS.CamRotate.settingschanged</string>
       </dict>
+      <dict>
+        <key>cell</key>
+        <string>PSGroupCell</string>
+        <key>label</key>
+        <string>Orientation management</string>
+    </dict>
       <dict>
         <key>cell</key>
         <string>PSSwitchCell</string>
@@ -55,7 +67,7 @@
 			<key>key</key>
 			<string>OrientationValue</string>
 			<key>label</key>
-			<string>Orientation</string>
+			<string>Lock Orientation:</string>
 			<key>PostNotification</key>
         	<string>com.PS.CamRotate.settingschanged</string>
 			<key>validTitles</key>
@@ -88,6 +100,12 @@
         <string>com.PS.CamRotate.settingschanged</string>
       </dict>
       <dict>
+        <key>cell</key>
+        <string>PSGroupCell</string>
+        <key>label</key>
+        <string>Rotation</string>
+    </dict>
+      <dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>defaults</key>
@@ -96,10 +114,6 @@
 			<string>PSListItemsController</string>
 			<key>key</key>
 			<string>RotationStyle</string>
-			<key>id</key>
-			<string>RotationStyle</string>
-			<key>enabled</key>
-			<true/>
 			<key>label</key>
 			<string>Rotation Style</string>
 			<key>PostNotification</key>
@@ -107,8 +121,8 @@
 			<key>validTitles</key>
 			<array>
 				<string>Default</string>
-				<string>iPad-like (For iOS 6)</string>
-				<string>Video-like (For iOS 7+)</string>
+				<string>iPad-like (iOS 6)</string>
+				<string>Video-like (iOS 7+)</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -116,13 +130,14 @@
 				<integer>3</integer>
 				<integer>4</integer>
 			</array>
+			<key>pl_filter</key>
+			<dict>
+				<key>CoreFoundationVersion</key>
+				<array>
+					<string>793.00</string>
+				</array>
+			</dict>
 		</dict>
-		<dict>
-        <key>cell</key>
-        <string>PSGroupCell</string>
-        <key>label</key>
-        <string>Allow rotation when recording video</string>
-        </dict>
         <dict>
         <key>cell</key>
         <string>PSSwitchCell</string>
@@ -133,15 +148,13 @@
         <key>key</key>
         <string>UnlockVideoUI</string>
         <key>label</key>
-        <string>Enabled</string>
+        <string>Rotate when recording</string>
         <key>PostNotification</key>
         <string>com.PS.CamRotate.settingschanged</string>
       </dict>
 		<dict>
         <key>cell</key>
         <string>PSGroupCell</string>
-		<key>id</key>
-		<string>Description</string>
         <key>footerText</key>
         <string>• Lock Orientation - Disallow orientation changing in camera.
         
@@ -152,7 +165,7 @@
 2. iPad-like - iOS 6, UIs in camera view will rotate around the middle of screen correspond with camera orientation.
 3. Video-like - iOS 7+, Camera's Top Bar will rotate just like how the video mode does. (rotate around screen)
 
-• Allow rotation when recording video - Prevent camera from orientation fixed while recording video.</string>
+• Rotate when recording - Prevent camera from orientation fixed while recording video.</string>
       </dict>
        <dict>
         <key>cell</key>
@@ -160,7 +173,7 @@
         <key>footerAlignment</key>
         <integer>1</integer>
         <key>footerText</key>
-        <string>© 2013 - 2014 Thatchapon Unprasert
+        <string>© 2013 - 2015 Thatchapon Unprasert
 (@PoomSmart)</string>
       </dict>
     </array>

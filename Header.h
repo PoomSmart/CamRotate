@@ -1,3 +1,3 @@
 #import "../PS.h"
 
-NSString *const PREF_PATH = @"/var/mobile/Library/Preferences/com.PS.CamRotate.plist";
+NSString *PREF_PATH = @"/var/mobile/Library/Preferences/com.PS.CamRotate.plist";

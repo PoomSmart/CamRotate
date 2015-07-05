@@ -4,7 +4,6 @@
 #import "Header.h"
 
 @interface CamRotatePreferenceController : PSListController
-@property (nonatomic, retain) PSSpecifier *rotationStyleSpec;
 @end
 
 @implementation CamRotatePreferenceController
@@ -31,18 +30,9 @@
 {
 	if (_specifiers == nil) {
 		NSMutableArray *specs = [NSMutableArray arrayWithArray:[self loadSpecifiersFromPlistName:@"CamRotate" target:self]];
-		
-		for (PSSpecifier *spec in specs) {
-			NSString *Id = [spec identifier];
-			if ([Id isEqualToString:@"RotationStyle"])
-				self.rotationStyleSpec = spec;
-		}
-		if (isiOS5)
-			[specs removeObject:self.rotationStyleSpec];
 		_specifiers = [specs copy];
 	}
 	return _specifiers;
 }
 
 @end
-

@@ -3,9 +3,14 @@ SDKVERSION = 7.0
 ARCHS = armv7 arm64
 
 include theos/makefiles/common.mk
+
+AGGREGATE_NAME = CamRotateTweak
+SUBPROJECTS = CamRotateiOS56 CamRotateiOS7 CamRotateiOS8 CamRotateiOS9
+
+include $(THEOS_MAKE_PATH)/aggregate.mk
+
 TWEAK_NAME = CamRotate
 CamRotate_FILES = Tweak.xm
-CamRotate_FRAMEWORKS = UIKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
