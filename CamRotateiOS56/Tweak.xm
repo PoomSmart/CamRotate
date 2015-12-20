@@ -28,9 +28,9 @@
 
 %hook PLCameraView
 
-- (NSInteger)_glyphOrientationForCameraOrientation:(NSInteger)orientation
+- (int)_glyphOrientationForCameraOrientation:(int)orientation
 {
-	return glyphOrientationOverride(orientation, %orig);
+	return glyphOrientationOverride(%orig);
 }
 
 - (CGFloat)previewImageRotationAngle
@@ -45,39 +45,6 @@
 	%orig;
 	if (rotationStyle == 3)
 		MSHookIvar<NSInteger>(self, "_rotationStyle") = -1;
-}
-
-%end
-
-%hook PLCameraElapsedTimeView
-
-- (void)_setDeviceOrientation:(NSInteger)orientation animated:(BOOL)animated
-{
-	if (unlockVideo)
-		return;
-	%orig;
-}
-
-%end
-
-%hook PLCameraController
-
-%new
-- (BOOL)isSyncOrientation
-{
-	return SyncOrientation;
-}
-
-- (BOOL)isCapturingVideo
-{
-	return UnlockVideoUI && unlockVideo ? NO : %orig;
-}
-
-- (void)accelerometer:(id)accelerometer didChangeDeviceOrientation:(NSInteger)orientation
-{
-	unlockVideo = [self isCapturingVideo] && UnlockVideoUI;
-	%orig;
-	unlockVideo = NO;
 }
 
 %end

@@ -1,25 +1,10 @@
 #import "../Functions.h"
 
-%hook CAMCaptureController
-
-%new
-- (BOOL)isSyncOrientation
-{
-	return SyncOrientation;
-}
-
-- (BOOL)isCapturingVideo
-{
-	return UnlockVideoUI && unlockVideo ? NO : %orig;
-}
-
-%end
-
 %hook CAMCameraView
 
-- (NSInteger)_glyphOrientationForCameraOrientation:(NSInteger)orientation
+- (int)_glyphOrientationForCameraOrientation:(int)orientation
 {
-	return glyphOrientationOverride(orientation, %orig);
+	return glyphOrientationOverride(%orig);
 }
 
 - (void)_updateEnabledControlsWithReason:(id)reason forceLog:(BOOL)log
@@ -29,30 +14,20 @@
 		[self _rotateCameraControlsAndInterface];
 }
 
-- (void)_cameraOrientationChanged:(NSInteger)orientation
-{
-	CAMCaptureController *cont = [%c(CAMCaptureController) sharedInstance];
-	unlockVideo = [cont isCapturingVideo] && UnlockVideoUI;
-	%orig;
-	unlockVideo = NO;
-}
-
-- (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(NSInteger)orientation cameraMode:(NSInteger)mode
+- (BOOL)_shouldApplyRotationDirectlyToTopBarForOrientation:(int)orientation cameraMode:(int)mode
 {
 	return rotationStyle == 4 ? YES : %orig;
 }
 
-- (void)_updateTopBarStyleForDeviceOrientation:(NSInteger)orientation
+- (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
 {
-	CAMCaptureController *cont = [%c(CAMCaptureController) sharedInstance];
+	CAMCaptureController *cont = (CAMCaptureController *)[%c(CAMCaptureController) sharedInstance];
 	if (cont) {
-		unlockVideo = UnlockVideoUI;
-		NSInteger origMode = MSHookIvar<NSInteger>(cont, "_cameraMode");
+		int origMode = MSHookIvar<int>(cont, "_cameraMode");
 		if (rotationStyle == 4)
-			MSHookIvar<NSInteger>(cont, "_cameraMode") = 1;
+			MSHookIvar<int>(cont, "_cameraMode") = 1;
 		%orig;
-		MSHookIvar<NSInteger>(cont, "_cameraMode") = origMode;
-		unlockVideo = NO;
+		MSHookIvar<int>(cont, "_cameraMode") = origMode;
 	} else
 		%orig;
 }

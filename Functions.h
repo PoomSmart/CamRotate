@@ -4,11 +4,9 @@
 static BOOL CamRotateisOn;
 static BOOL CamRotateLock;
 static BOOL SyncOrientation;
-static BOOL UnlockVideoUI;
-static BOOL unlockVideo = NO;
 
-static NSInteger rotationStyle;
-static NSInteger orientationValue;
+static int rotationStyle;
+static int orientationValue;
 
 static void CamRotateLoader()
 {
@@ -19,15 +17,13 @@ static void CamRotateLoader()
 	CamRotateLock = [val boolValue];
 	val = dict[@"SyncOrientation"];
 	SyncOrientation = [val boolValue];
-	val = dict[@"UnlockVideoUI"];
-	UnlockVideoUI = [val boolValue];
 	val = dict[@"RotationStyle"];
-	rotationStyle = val ? [val integerValue] : 2;
+	rotationStyle = val ? [val intValue] : 2;
 	val = dict[@"OrientationValue"];
-	orientationValue = val ? [val integerValue] : 1;
+	orientationValue = val ? [val intValue] : 1;
 }
 
-static NSInteger glyphOrientationOverride(NSInteger orientation, NSInteger orig)
+static int glyphOrientationOverride(int orig)
 {
 	if (CamRotateLock)
 		return orientationValue;
@@ -42,8 +38,6 @@ static NSInteger glyphOrientationOverride(NSInteger orientation, NSInteger orig)
 				return 4;
 			case UIInterfaceOrientationLandscapeRight:
 				return 3;
-			default:
-				return orig;
 		}
 	}
 	return orig;

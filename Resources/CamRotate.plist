@@ -138,20 +138,6 @@
 				</array>
 			</dict>
 		</dict>
-        <dict>
-        <key>cell</key>
-        <string>PSSwitchCell</string>
-        <key>default</key>
-        <false/>
-        <key>defaults</key>
-        <string>com.PS.CamRotate</string>
-        <key>key</key>
-        <string>UnlockVideoUI</string>
-        <key>label</key>
-        <string>Rotate when recording</string>
-        <key>PostNotification</key>
-        <string>com.PS.CamRotate.settingschanged</string>
-      </dict>
 		<dict>
         <key>cell</key>
         <string>PSGroupCell</string>
@@ -163,9 +149,7 @@
 • Rotation Style (iOS 6+)
 1. Default - Camera-default. (UIs in camera view will fading when they change orientation)
 2. iPad-like - iOS 6, UIs in camera view will rotate around the middle of screen correspond with camera orientation.
-3. Video-like - iOS 7+, Camera's Top Bar will rotate just like how the video mode does. (rotate around screen)
-
-• Rotate when recording - Prevent camera from orientation fixed while recording video.</string>
+3. Video-like - iOS 7+, Camera's Top Bar will rotate just like how the video mode does. (rotate around screen)</string>
       </dict>
        <dict>
         <key>cell</key>
@@ -179,4 +163,3 @@
     </array>
   </dict>
 </plist>
-	
