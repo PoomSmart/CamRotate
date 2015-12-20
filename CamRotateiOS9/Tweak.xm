@@ -28,19 +28,6 @@
 
 %end
 
-/*- (void)_updateTopBarStyleForDeviceOrientation:(int)orientation
-{
-	CMKCaptureController *cont = [%c(CMKCaptureController) sharedInstance];
-	if (cont) {
-		NSInteger origMode = MSHookIvar<NSInteger>(cont, "_cameraMode");
-		if (rotationStyle == 4)
-			MSHookIvar<NSInteger>(cont, "_cameraMode") = 1;
-		%orig;
-		MSHookIvar<NSInteger>(cont, "_cameraMode") = origMode;
-	} else
-		%orig;
-}*/
-
 %ctor
 {
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
