@@ -51,10 +51,10 @@
 
 %ctor
 {
-	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-	CamRotateLoader();
+	HaveObserver()
+	callback();
 	if (CamRotateisOn) {
-		dlopen("/System/Library/PrivateFrameworks/PhotoLibrary.framework/PhotoLibrary", RTLD_LAZY);
+		openCamera6();
 		%init;
 	}
 }

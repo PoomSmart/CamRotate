@@ -1,34 +1,32 @@
 #import <UIKit/UIKit.h>
-#import "Header.h"
+#import "Common.h"
+#import "../PS.h"
+#import "../PSPrefs.x"
+#import <substrate.h>
 
-static BOOL CamRotateisOn;
-static BOOL CamRotateLock;
-static BOOL SyncOrientation;
+BOOL CamRotateisOn;
+BOOL CamRotateLock;
+BOOL SyncOrientation;
 
-static int rotationStyle;
-static int orientationValue;
+int rotationStyle;
+int orientationValue;
 
-static void CamRotateLoader()
+HaveCallback()
 {
-	NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_PATH];
-	id val = dict[@"CamRotateEnabled"];
-	CamRotateisOn = [val boolValue];
-	val = dict[@"CamRotateLock"];
-	CamRotateLock = [val boolValue];
-	val = dict[@"SyncOrientation"];
-	SyncOrientation = [val boolValue];
-	val = dict[@"RotationStyle"];
-	rotationStyle = val ? [val intValue] : 2;
-	val = dict[@"OrientationValue"];
-	orientationValue = val ? [val intValue] : 1;
+	GetPrefs()
+	GetBool(CamRotateisOn, @"CamRotateEnabled", YES)
+	GetBool(CamRotateLock, @"CamRotateLock", NO)
+	GetBool(SyncOrientation, @"SyncOrientation", NO)
+	GetInt(rotationStyle, @"RotationStyle", 2)
+	GetInt(orientationValue, @"OrientationValue", 1)
 }
 
-static int glyphOrientationOverride(int orig)
+int glyphOrientationOverride(int orig)
 {
 	if (CamRotateLock)
 		return orientationValue;
 	if (SyncOrientation) {
-		UIInterfaceOrientation orient = [[UIDevice currentDevice] orientation];
+		UIInterfaceOrientation orient = [UIDevice.currentDevice orientation];
 		switch (orient) {
 			case UIInterfaceOrientationPortrait:
 				return 1;
@@ -41,10 +39,4 @@ static int glyphOrientationOverride(int orig)
 		}
 	}
 	return orig;
-}
-
-static void PostNotification(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
-{
-	system("killall Camera");
-	CamRotateLoader();
 }

@@ -36,10 +36,14 @@
 
 %ctor
 {
-	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PostNotification, CFSTR("com.PS.CamRotate.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-	CamRotateLoader();
+	NSString *identifier = NSBundle.mainBundle.bundleIdentifier;
+	BOOL isSpringBoard = [identifier isEqualToString:@"com.apple.springboard"];
+	if (isSpringBoard)
+		return;
+	HaveObserver()
+	callback();
 	if (CamRotateisOn) {
-		dlopen("/System/Library/PrivateFrameworks/PhotoLibrary.framework/PhotoLibrary", RTLD_LAZY);
+		openCamera7();
 		%init;
 	}
 }

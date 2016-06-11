@@ -15,17 +15,11 @@
     </dict>
     <key>items</key>
     <array>
-      <dict>
-        <key>cell</key>
-        <string>PSGroupCell</string>
-        <key>label</key>
-        <string>Kill switch</string>
-    </dict>
     <dict>
         <key>cell</key>
         <string>PSSwitchCell</string>
         <key>default</key>
-        <false/>
+        <true/>
         <key>defaults</key>
         <string>com.PS.CamRotate</string>
         <key>key</key>
@@ -33,8 +27,43 @@
         <key>label</key>
         <string>Enabled</string>
         <key>PostNotification</key>
-        <string>com.PS.CamRotate.settingschanged</string>
+        <string>com.PS.CamRotate/ReloadPrefs</string>
+        <key>set</key>
+        <string>masterSwitch:specifier:</string>
       </dict>
+      <dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>defaults</key>
+			<string>com.PS.CamRotate</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>key</key>
+			<string>RotationStyle</string>
+			<key>label</key>
+			<string>Rotation Style</string>
+			<key>PostNotification</key>
+        	<string>com.PS.CamRotate/ReloadPrefs</string>
+			<key>validTitles</key>
+			<array>
+				<string>Default</string>
+				<string>iPad-like (iOS 6)</string>
+				<string>Video-like (iOS 7+)</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+			</array>
+			<key>pl_filter</key>
+			<dict>
+				<key>CoreFoundationVersion</key>
+				<array>
+					<string>793.00</string>
+				</array>
+			</dict>
+		</dict>
       <dict>
         <key>cell</key>
         <string>PSGroupCell</string>
@@ -53,7 +82,7 @@
         <key>label</key>
         <string>Lock Orientation</string>
         <key>PostNotification</key>
-        <string>com.PS.CamRotate.settingschanged</string>
+        <string>com.PS.CamRotate/ReloadPrefs</string>
       </dict>
       <dict>
 			<key>cell</key>
@@ -69,7 +98,7 @@
 			<key>label</key>
 			<string>Lock Orientation:</string>
 			<key>PostNotification</key>
-        	<string>com.PS.CamRotate.settingschanged</string>
+        	<string>com.PS.CamRotate/ReloadPrefs</string>
 			<key>validTitles</key>
 			<array>
 				<string>Portrait</string>
@@ -97,50 +126,13 @@
         <key>label</key>
         <string>Sync Orientation</string>
         <key>PostNotification</key>
-        <string>com.PS.CamRotate.settingschanged</string>
+        <string>com.PS.CamRotate/ReloadPrefs</string>
       </dict>
-      <dict>
-        <key>cell</key>
-        <string>PSGroupCell</string>
-        <key>label</key>
-        <string>Rotation</string>
-    </dict>
-      <dict>
-			<key>cell</key>
-			<string>PSLinkListCell</string>
-			<key>defaults</key>
-			<string>com.PS.CamRotate</string>
-			<key>detail</key>
-			<string>PSListItemsController</string>
-			<key>key</key>
-			<string>RotationStyle</string>
-			<key>label</key>
-			<string>Rotation Style</string>
-			<key>PostNotification</key>
-        	<string>com.PS.CamRotate.settingschanged</string>
-			<key>validTitles</key>
-			<array>
-				<string>Default</string>
-				<string>iPad-like (iOS 6)</string>
-				<string>Video-like (iOS 7+)</string>
-			</array>
-			<key>validValues</key>
-			<array>
-				<integer>2</integer>
-				<integer>3</integer>
-				<integer>4</integer>
-			</array>
-			<key>pl_filter</key>
-			<dict>
-				<key>CoreFoundationVersion</key>
-				<array>
-					<string>793.00</string>
-				</array>
-			</dict>
-		</dict>
 		<dict>
         <key>cell</key>
         <string>PSGroupCell</string>
+        <key>footerAlignment</key>
+        <integer>0</integer>
         <key>footerText</key>
         <string>• Lock Orientation - Disallow orientation changing in camera.
         
@@ -152,12 +144,42 @@
 3. Video-like - iOS 7+, Camera's Top Bar will rotate just like how the video mode does. (rotate around screen)</string>
       </dict>
        <dict>
+      		<key>cell</key>
+      		<string>PSGroupCell</string>
+      		<key>label</key>
+      		<string>Developer</string>
+      </dict>
+      <dict>
+    	<key>big</key>
+    	<true/>
+    	<key>cellClass</key>
+		<string>HBTwitterCell</string>
+		<key>height</key>
+		<integer>60</integer>
+		<key>label</key>
+		<string>PoomSmart</string>
+		<key>user</key>
+		<string>PoomSmart</string>
+	</dict>
+      <dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>HBLinkTableCell</string>
+			<key>label</key>
+			<string>Donate ❤️</string>
+			<key>alignment</key>
+			<integer>1</integer>
+			<key>url</key>
+			<string>http://poomsmartios.blogspot.com/2015/08/donation.html</string>
+		</dict>
+       <dict>
         <key>cell</key>
         <string>PSGroupCell</string>
         <key>footerAlignment</key>
         <integer>1</integer>
         <key>footerText</key>
-        <string>© 2013 - 2015 Thatchapon Unprasert
+        <string>© 2013 - 2016 Thatchapon Unprasert
 (@PoomSmart)</string>
       </dict>
     </array>

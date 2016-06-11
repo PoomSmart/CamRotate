@@ -1,38 +1,80 @@
 #import <UIKit/UIKit.h>
-#import <Preferences/PSListController.h>
-#import <Preferences/PSSpecifier.h>
-#import "Header.h"
+#import <Social/Social.h>
+#import <Cephei/HBListController.h>
+#import <Cephei/HBAppearanceSettings.h>
+#import "Common.h"
+#import "../PS.h"
+#import "../PSPrefs.x"
+#import <dlfcn.h>
 
-@interface CamRotatePreferenceController : PSListController
+@interface CamRotatePreferenceController : HBListController
 @end
 
 @implementation CamRotatePreferenceController
 
-- (id)readPreferenceValue:(PSSpecifier *)specifier
+HavePrefs()
+
++ (nullable NSString *)hb_specifierPlist
 {
-	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREF_PATH];
-	if (!settings[specifier.properties[@"key"]])
-		return specifier.properties[@"default"];
-	return settings[specifier.properties[@"key"]];
-}
- 
-- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier
-{
-	NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
-	[defaults addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:PREF_PATH]];
-	[defaults setObject:value forKey:specifier.properties[@"key"]];
-	[defaults writeToFile:PREF_PATH atomically:YES];
-	CFStringRef post = (CFStringRef)specifier.properties[@"PostNotification"];
-	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), post, NULL, NULL, YES);
+	return @"CamRotate";
 }
 
-- (NSArray *)specifiers
+- (void)masterSwitch:(id)value specifier:(PSSpecifier *)spec
 {
-	if (_specifiers == nil) {
-		NSMutableArray *specs = [NSMutableArray arrayWithArray:[self loadSpecifiersFromPlistName:@"CamRotate" target:self]];
-		_specifiers = [specs copy];
+	[self setPreferenceValue:value specifier:spec];
+	system("killall Camera");
+}
+
+- (void)loadView
+{
+	[super loadView];
+	UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
+	UILabel *tweakLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 16, 320, 50)];
+	tweakLabel.text = @"CamRotate";
+	tweakLabel.textColor = isiOS7Up ? UIColor.systemGreenColor : UIColor.greenColor;
+	tweakLabel.backgroundColor = UIColor.clearColor;
+	tweakLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:50.0];
+	tweakLabel.textAlignment = 1;
+	tweakLabel.autoresizingMask = 0x12;
+	[headerView addSubview:tweakLabel];
+	[tweakLabel release];
+	UILabel *des = [[UILabel alloc] initWithFrame:CGRectMake(0, 75, 320, 14)];
+	des.text = @"Rotate camera interface in styles";
+	des.backgroundColor = UIColor.clearColor;
+	des.alpha = 0.8;
+	des.font = [UIFont systemFontOfSize:14.0];
+	des.textAlignment = 1;
+	des.autoresizingMask = 0xa;
+	[headerView addSubview:des];
+	[des release];
+	self.table.tableHeaderView = headerView;
+	[headerView release];
+}
+
+- (instancetype)init
+{
+	if (self == [super init]) {
+		HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
+		appearanceSettings.tintColor = isiOS7Up ? UIColor.systemGreenColor : UIColor.greenColor;
+		appearanceSettings.tableViewCellTextColor = isiOS7Up ? UIColor.systemGreenColor : UIColor.greenColor;
+		self.hb_appearanceSettings = appearanceSettings;
+		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"💚" style:UIBarButtonItemStylePlain target:self action:@selector(love)] autorelease];
 	}
-	return _specifiers;
+	return self;
+}
+
+- (void)love
+{
+	SLComposeViewController *twitter = [[SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter] retain];
+	twitter.initialText = @"#CamRotate by @PoomSmart is really awesome!";
+	[self.navigationController presentViewController:twitter animated:YES completion:nil];
+	[twitter release];
 }
 
 @end
+
+__attribute__((constructor)) static void ctor()
+{
+	if (isiOS56)
+		dlopen("/Library/Application Support/CamRotate/Workaround_Cephei_iOS56.dylib", RTLD_LAZY);
+}
