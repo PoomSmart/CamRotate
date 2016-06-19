@@ -6,7 +6,7 @@ PACKAGE_VERSION = 1.3-3
 include $(THEOS)/makefiles/common.mk
 
 AGGREGATE_NAME = CamRotateTweak
-SUBPROJECTS = CamRotateiOS56 CamRotateiOS7 CamRotateiOS8 CamRotateiOS9 Workaround_Cephei_iOS56
+SUBPROJECTS = CamRotateiOS56 CamRotateiOS7 CamRotateiOS8 CamRotateiOS9 CamRotateiOS10 Workaround_Cephei_iOS56
 
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
