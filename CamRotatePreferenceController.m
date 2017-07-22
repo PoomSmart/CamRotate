@@ -1,4 +1,6 @@
-#import <UIKit/UIKit.h>
+#define UIFUNCTIONS_NOT_C
+#define KILL_PROCESS
+#import <UIKit/UIColor+Private.h>
 #import <Social/Social.h>
 #import <Cephei/HBListController.h>
 #import <Cephei/HBAppearanceSettings.h>
@@ -13,37 +15,34 @@
 
 HavePrefs()
 
-+ (NSString *)hb_specifierPlist
-{
-	return @"CamRotate";
++ (NSString *)hb_specifierPlist {
+    return @"CamRotate";
 }
 
-- (void)masterSwitch:(id)value specifier:(PSSpecifier *)spec
-{
-	[self setPreferenceValue:value specifier:spec];
-	system("killall Camera");
+- (void)masterSwitch:(id)value specifier:(PSSpecifier *)spec {
+    [self setPreferenceValue:value specifier:spec];
+    killProcess("Camera");
 }
 
 HaveBanner2(@"CamRotate", isiOS7Up ? UIColor.systemGreenColor : UIColor.greenColor, @"Rotate camera interface in styles", UIColor.greenColor)
 
-- (instancetype)init
-{
-	if (self == [super init]) {
-		HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
-		appearanceSettings.tintColor = isiOS7Up ? UIColor.systemGreenColor : UIColor.greenColor;
-		appearanceSettings.tableViewCellTextColor = isiOS7Up ? UIColor.systemGreenColor : UIColor.greenColor;
-		self.hb_appearanceSettings = appearanceSettings;
-		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"💚" style:UIBarButtonItemStylePlain target:self action:@selector(love)] autorelease];
-	}
-	return self;
+- (instancetype)init {
+    if (self == [super init]) {
+        HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
+        appearanceSettings.tintColor = isiOS7Up ? UIColor.systemGreenColor : UIColor.greenColor;
+        appearanceSettings.tableViewCellTextColor = isiOS7Up ? UIColor.systemGreenColor : UIColor.greenColor;
+        self.hb_appearanceSettings = appearanceSettings;
+        if (isiOS6Up)
+            self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"💚" style:UIBarButtonItemStylePlain target:self action:@selector(love)] autorelease];
+    }
+    return self;
 }
 
-- (void)love
-{
-	SLComposeViewController *twitter = [[SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter] retain];
-	twitter.initialText = @"#CamRotate by @PoomSmart is really awesome!";
-	[self.navigationController presentViewController:twitter animated:YES completion:nil];
-	[twitter release];
+- (void)love {
+    SLComposeViewController *twitter = [[SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter] retain];
+    twitter.initialText = @"#CamRotate by @PoomSmart is really awesome!";
+    [self.navigationController presentViewController:twitter animated:YES completion:nil];
+    [twitter release];
 }
 
 @end

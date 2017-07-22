@@ -1,12 +1,10 @@
-GO_EASY_ON_ME = 1
-ARCHS = armv7 arm64
-DEBUG = 0
-PACKAGE_VERSION = 1.3-3
+PACKAGE_VERSION = 1.3.4
+TARGET = iphone:clang:9.0:5.0
 
 include $(THEOS)/makefiles/common.mk
 
 AGGREGATE_NAME = CamRotateTweak
-SUBPROJECTS = CamRotateiOS56 CamRotateiOS7 CamRotateiOS8 CamRotateiOS9 CamRotateiOS10 Workaround_Cephei_iOS56
+SUBPROJECTS = CamRotateiOS56 CamRotateiOS78 CamRotateiOS910
 
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
@@ -20,7 +18,8 @@ CamRotateSettings_FILES = CamRotatePreferenceController.m
 CamRotateSettings_INSTALL_PATH = /Library/PreferenceBundles
 CamRotateSettings_PRIVATE_FRAMEWORKS = Preferences
 CamRotateSettings_FRAMEWORKS = Social UIKit
-CamRotateSettings_LIBRARIES = cepheiprefs
+CamRotateSettings_EXTRA_FRAMEWORKS = CepheiPrefs
+CamRotateSettings_LDFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

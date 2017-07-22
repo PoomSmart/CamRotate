@@ -43,11 +43,11 @@
 			<key>label</key>
 			<string>Rotation Style</string>
 			<key>PostNotification</key>
-        	<string>com.PS.CamRotate/ReloadPrefs</string>
+      <string>com.PS.CamRotate/ReloadPrefs</string>
 			<key>validTitles</key>
 			<array>
 				<string>Default</string>
-				<string>iPad-like (iOS 6)</string>
+				<string>iPad-like (iOS 5-6)</string>
 				<string>Video-like (iOS 7+)</string>
 			</array>
 			<key>validValues</key>
@@ -135,7 +135,7 @@
         <integer>0</integer>
         <key>footerText</key>
         <string>• Lock Orientation - Disallow orientation changing in camera.
-        
+
 • Sync Orientation - Sync camera orientation with system. (By default, even you lock orientation in iDevice, camera still can rotate itself, this one fix that issue.)
 
 • Rotation Style (iOS 6+)
@@ -150,28 +150,28 @@
       		<string>Developer</string>
       </dict>
       <dict>
-    	<key>big</key>
-    	<true/>
-    	<key>cellClass</key>
-		<string>HBTwitterCell</string>
-		<key>height</key>
-		<integer>60</integer>
-		<key>label</key>
-		<string>PoomSmart</string>
-		<key>user</key>
-		<string>PoomSmart</string>
-	</dict>
+        	<key>big</key>
+        	<true/>
+        	<key>cellClass</key>
+      		<string>HBTwitterCell</string>
+      		<key>height</key>
+      		<integer>60</integer>
+      		<key>label</key>
+      		<string>PoomSmart</string>
+      		<key>user</key>
+      		<string>PoomSmart</string>
+    	</dict>
       <dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>HBLinkTableCell</string>
-			<key>label</key>
-			<string>Donate ❤️</string>
-			<key>alignment</key>
-			<integer>1</integer>
-			<key>url</key>
-			<string>http://poomsmart.github.io/repo/</string>
+    			<key>cell</key>
+    			<string>PSButtonCell</string>
+    			<key>cellClass</key>
+    			<string>HBLinkTableCell</string>
+    			<key>label</key>
+    			<string>Donate ❤️</string>
+    			<key>alignment</key>
+    			<integer>1</integer>
+    			<key>url</key>
+    			<string>https://poomsmart.github.io/repo/</string>
 		</dict>
        <dict>
         <key>cell</key>
@@ -179,7 +179,7 @@
         <key>footerAlignment</key>
         <integer>1</integer>
         <key>footerText</key>
-        <string>© 2013 - 2016 Thatchapon Unprasert
+        <string>© 2013 - 2017 Thatchapon Unprasert
 (@PoomSmart)</string>
       </dict>
     </array>
